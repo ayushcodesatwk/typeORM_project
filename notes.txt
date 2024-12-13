@@ -1,0 +1,14 @@
+ORM => OBJECT RELATIONAL MAPPER (uses OOP concepts to feed into database)
+
+In large enterprise apps flow goes top to bottom like this-
+
+Express (or any backend web app)
+    ||
+    \/
+ORM (typeorm or other)
+    ||
+    \/
+DATABASE DRIVER (postgres, sql etc)
+
+
+- by default all operations are asynchronous in typeORM

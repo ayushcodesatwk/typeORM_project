@@ -2,6 +2,8 @@ import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import { Profile } from "../entities/profile";
+import { Product } from "../entities/product";
+
 
 const router = express.Router();
 
@@ -44,7 +46,7 @@ router.route('/').get( async (req, res) => {
 
     //inserting in database
     const userInserted = await userRepo.save(user);
-    
+
     res.json(userInserted);
 }).put(async (req, res) => {
     
@@ -68,10 +70,16 @@ router.route('/').get( async (req, res) => {
 })
 
 
-//one-to-one relation
-router.route('/oneToOne').get(async (req, res) => {
+//store router
+router.route('/store').get(async (req, res) => {
 
-   
-}) 
+    const productRepo = AppDataSource.getRepository(Product);
+    
+    const allProducts = await productRepo.find({});    
+
+    res.json(allProducts);
+    
+})
+
 
 export default router;

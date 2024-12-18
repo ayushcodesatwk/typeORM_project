@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { AppDataSource } from "./data-source";
 import router from "./routes/user";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = 4000;
@@ -10,11 +11,14 @@ const port = 4000;
 //only accept the request from given origin
 const corsOptions = {
   origin: ["http://localhost:5173"],
+  credentials: true  //to send and receive cookies
 };
 
 //middlewares
 app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(router);
 
 //connect to the db and server

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
-import { Profile } from "./profile";
+
 
 
 @Entity()
@@ -17,8 +17,13 @@ export class Users{
     @Column({type: "varchar"})
     email: string;
 
-    @OneToOne(() => Profile)
-    @JoinColumn()
-    profile: Profile
+    @Column({type: "varchar"})
+    password: string;
+
+    @Column({type: 'varchar', nullable: true})
+    address: string;
+
+    @Column({type: 'numeric', nullable:true})
+    phone: number;
 
 };

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import store from "../../store";
-import { addAllItems, addItemToCart } from "../../store/slices/storeSlice";
+import { addAllItems } from "../../store/slices/storeSlice";
+import {addItemToCart } from "../../store/slices/cartSlice"
 import { Link } from "react-router-dom";
 
 const Store = () => {
@@ -29,8 +29,15 @@ const Store = () => {
   }, []);
 
 
-  const addItemHandler = (item) => {
-    dispatch(addItemToCart(item));
+  const addItemHandler = async (item) => {
+    const result = await axios.post('http://localhost:4000/cart', {
+        product: item,
+    })
+
+    if(result.status == 201){
+      dispatch(addItemToCart( item ));
+    }
+
   }
 
   return (

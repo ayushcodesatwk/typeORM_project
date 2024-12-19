@@ -6,6 +6,8 @@ const Cart = () => {
   const cartArray = useSelector((state) => state.cart.cartArray);
   const dispatch = useDispatch();
 
+  const totalAmount = 0;
+
 
   return (
     <>
@@ -21,7 +23,7 @@ const Cart = () => {
                       <img className='w-40 h-40 rounded-xl shadow-lg' src={item.image} alt={item.title}/>
                       <div className='mt-3 ml-10 font-medium text-lg'>
                         <p>{item.title}</p>
-                        <p className='mt-3'>$ {item.price}</p>
+                        <p className='mt-3'>$ {item.price} * 9</p>
                         <button onClick={() => dispatch(removeItemFromCart(item.id))} className='mt-2 p-2 rounded-md bg-red-400 text-stone-200 hover:bg-red-700 hover:text-white'>Remove Item</button>
                       </div>
                     </div>

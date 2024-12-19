@@ -4,7 +4,6 @@ import jwtoken from "jsonwebtoken";
 // function to verify if he's login
 const requireAuth = (req: any, res: any, next: any) => {
   const token = req.cookies.jwt;
-  console.log("line7-", token);
 
   if (token) {
     jwtoken.verify(token, "chickiwikichicki", () => {});

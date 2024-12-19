@@ -1,9 +1,13 @@
+import {Request, Response, NextFunction} from 'express';
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import bcrypt from "bcrypt";
 import { createToken } from "../service/auth";
+import requireAuth from "../middlewares/user";
+import { Cart } from "../entities/cart";
 
-export const handleCreateNewUser = async (req: any, res: any) => {
+//creating a new user
+export const handleCreateNewUser = async (req: Request, res: Response) => {
   const { fname, lname, address, phone, email, password } = req.body;
   console.log(fname, address);
 
@@ -51,7 +55,7 @@ export const handleCreateNewUser = async (req: any, res: any) => {
 };
 
 //handle login
-export const handleUserLogin = async (req: any, res: any) => {
+export const handleUserLogin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   console.log("line 57 user login", email, password);
@@ -78,7 +82,8 @@ export const handleUserLogin = async (req: any, res: any) => {
           path: "/", // Specify the path (root path by default)
         });
 
-        return res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({ message: "Login successful", token });
+        return;
       }
     }
   } catch (error) {
@@ -87,13 +92,14 @@ export const handleUserLogin = async (req: any, res: any) => {
 };
 
 // handle logout
-export const logoutOnGetRequest = async (req: any, res: any) => {
+export const logoutOnGetRequest = async (req: Request, res: Response) => {
   const cookies = req.cookies.jwt;
   console.log("logoutToken", cookies); // Debug: Check if the token exists
   res.clearCookie("jwt");
 
-  return res.status(200).json({ msg: "token cookie cleared " });
+  res.status(200).json({ msg: "token cookie cleared " });
 
+  return
   // if (token) {
   //     // Clear the cookie with the same path used when setting the cookie
   //     res.clearCookie('jwt', {
@@ -103,3 +109,35 @@ export const logoutOnGetRequest = async (req: any, res: any) => {
   // }
   // return res.status(400).json({ msg: "No cookie found" });
 };
+
+
+// adding item to cart
+export const addItemToCart = async (req: Request, res: Response, next: NextFunction) => {
+  
+  requireAuth(req, res, next); // middleware authenticates the user if loggedin
+
+  const { product } = req.body;
+
+  const productId = product.id;
+
+  const cartRepo = AppDataSource.getRepository(Cart);
+  
+  try {
+
+    let cart = await cartRepo.findOne({
+        where: { product: product }
+    })
+
+    if(!cart){
+      cart = new Cart();
+      
+      await cartRepo.save(cart);  
+    }
+
+    res.status(200).json({ message: 'Item added to cart successfully!' });
+
+  } catch (error) {
+    console.error('Error adding item to cart: ', error);
+    res.status(500).json({ message: 'Error adding item to cart.' });
+  }
+}   

@@ -10,10 +10,6 @@ const storeSlice = createSlice({
     name: 'store',
     initialState: initialState,
     reducers: {
-        addItemToCart: (state, action) => {
-            
-            
-        },
 
         addAllItems: (state, action) => {
 

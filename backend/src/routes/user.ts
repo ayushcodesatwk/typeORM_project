@@ -1,8 +1,10 @@
 import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
+import { Cart } from "../entities/cart";
 import { Product } from "../entities/product";
 import {
+  addItemToCart,
   handleCreateNewUser,
   handleUserLogin,
   logoutOnGetRequest,
@@ -78,7 +80,6 @@ router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
 // })
 
 //store router
-
 router.route("/store").get(async (req, res) => {
   const productRepo = AppDataSource.getRepository(Product);
 
@@ -86,5 +87,9 @@ router.route("/store").get(async (req, res) => {
 
   res.json(allProducts);
 });
+
+
+//cart router
+router.route("/cart").post(addItemToCart)
 
 export default router;

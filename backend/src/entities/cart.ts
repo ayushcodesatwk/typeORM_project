@@ -13,10 +13,7 @@ export class Cart{
 
     @ManyToOne(() => Users, user => user.carts)
     @JoinColumn({name: 'user_id'})
-    user: Users;
-
-    @Column({type: "int"})
-    customer_id: number;
+    user_id: Users;
 
     @ManyToOne(() => Product, product => product.carts)
     @JoinColumn({ name: "product_id" })

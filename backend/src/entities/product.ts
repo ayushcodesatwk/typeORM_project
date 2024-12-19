@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from "typeorm";
+import { Cart } from "./cart";
+
 
 @Entity()
 export class Product {
@@ -25,6 +27,8 @@ export class Product {
 
   @Column({type: "varchar", nullable: true})
   category: string;
+
+  //multiple cart Item can belong to one product.
+  @OneToMany(() => Cart, cart => cart.product)
+  carts: Cart[];
 }
-
-

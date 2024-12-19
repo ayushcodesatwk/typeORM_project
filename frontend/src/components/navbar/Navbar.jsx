@@ -15,8 +15,15 @@ const Navbar = () => {
 
   const logoutHandler = async () => {
     dispatch(handleLogout());
-    const result = await axios.get("http://localhost:4000/login");
-    console.log("user loggedout", result);
+    //always set withCredentials to true
+    const result = await axios.get("http://localhost:4000/login", {
+      withCredentials: true,
+    });
+    if(result.status == 200){
+        navigate("/login")
+        console.log("logout result--", result);
+    }
+    return
   };
 
   return (

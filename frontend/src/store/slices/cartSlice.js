@@ -2,12 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    isLoggedIn: true,
+    cartArray: [],
 }
 
 
 const cartSlice = createSlice({
-    name: 'auth',
+    name: 'cart',
     initialState: initialState,
     reducers: {
         

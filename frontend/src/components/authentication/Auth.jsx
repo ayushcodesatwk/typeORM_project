@@ -38,7 +38,7 @@ const Auth = () => {
         },
         {
           withCredentials: true, // This allows cookies to be sent and received
-        }
+        } 
       )
 
 
@@ -192,8 +192,8 @@ const Auth = () => {
                   type="tel"
                   // for a 10 digit number give pattern
                   pattern="[0-9]{10}"
-                  maxlength="10"
-                  minlength="10"
+                  maxLength="10"
+                  minLength="10"
                   placeholder="Enter your phone number"
                   name="phone"
                   id="phone"

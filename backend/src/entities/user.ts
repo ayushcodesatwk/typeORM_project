@@ -27,6 +27,6 @@ export class Users{
     @Column({type: 'numeric', nullable:true})
     phone: number;
 
-    @OneToMany(() => Cart, (cart) => cart.user_id)
+    @OneToMany(() => Cart, (cart) => cart.user)
     carts: Cart[]
 };

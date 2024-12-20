@@ -6,17 +6,16 @@ import { Product } from "./product";
 export class Cart{
     
     @PrimaryGeneratedColumn()
-    cart_id: number;
+    cartId: number;
 
-    @Column({type: "int"})
+    @Column({type: "int", default: 1})
     quantity: number;
 
     @ManyToOne(() => Users, user => user.carts)
-    @JoinColumn({name: 'user_id'})
-    user_id: Users;
+    @JoinColumn({name: 'userId'})
+    user: Users;
 
     @ManyToOne(() => Product, product => product.carts)
-    @JoinColumn({ name: "product_id" })
-    product: Product[];
-
+    @JoinColumn({ name: "productId" })
+    product: Product;
 }

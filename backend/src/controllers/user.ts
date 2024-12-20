@@ -1,10 +1,13 @@
-import {Request, Response, NextFunction} from 'express';
+import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import bcrypt from "bcrypt";
 import { createToken } from "../service/auth";
-import requireAuth from "../middlewares/user";
 import { Cart } from "../entities/cart";
+import requireAuth from "../middlewares/user";
+import { JwtPayload } from "jsonwebtoken";
+import jwtoken from "jsonwebtoken";
+import { Product } from "../entities/product";
 
 //creating a new user
 export const handleCreateNewUser = async (req: Request, res: Response) => {
@@ -99,7 +102,7 @@ export const logoutOnGetRequest = async (req: Request, res: Response) => {
 
   res.status(200).json({ msg: "token cookie cleared " });
 
-  return
+  return;
   // if (token) {
   //     // Clear the cookie with the same path used when setting the cookie
   //     res.clearCookie('jwt', {
@@ -111,33 +114,103 @@ export const logoutOnGetRequest = async (req: Request, res: Response) => {
 };
 
 
+
 // adding item to cart
-export const addItemToCart = async (req: Request, res: Response, next: NextFunction) => {
-  
-  requireAuth(req, res, next); // middleware authenticates the user if loggedin
+export const addItemToCart = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
 
+  // middleware authenticates the user if loggedin
+  const cartRepo = AppDataSource.getRepository(Cart);
+  const userRepo = AppDataSource.getRepository(Users);
+  const productRepo = AppDataSource.getRepository(Product);
+
+  //getting the product details
   const { product } = req.body;
-
   const productId = product.id;
 
-  const cartRepo = AppDataSource.getRepository(Cart);
+
+  //getting the token to get logged in userId
+  const token = req.cookies.jwt;
+  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+  console.log("log the web token data", data);
+  const userId = data.id;
+
+  console.log("this is product--",product);
+
+  // const user = await userRepo.findOne({ where: { id: userId } });
+
+  const existingProduct = await cartRepo.findOne({
+    where: {
+      user: { id: userId },
+      product: { id: productId },
+    },
+    relations: ['user', 'product'],  // This ensures related entities are fetched
+  });
+
+  console.log("this is existing product --",existingProduct);
+
+  if (existingProduct) {
+
+    existingProduct.quantity += 1;
+
+    await cartRepo.save(existingProduct);
+
+    res.status(200).json({ msg: "Quantity Updated" });
   
-  try {
+    return;
+  
+  } else {
 
-    let cart = await cartRepo.findOne({
-        where: { product: product }
-    })
+    let cart = new Cart();
 
-    if(!cart){
-      cart = new Cart();
-      
-      await cartRepo.save(cart);  
-    }
+    const product = await productRepo.findOne({ where: { id: productId } });
 
-    res.status(200).json({ message: 'Item added to cart successfully!' });
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+    } 
+    else{
+        
+        cart.product = product;
+        cart.user = userId;
+        cart.quantity = 1;
+        const addedNewCart = await cartRepo.save(cart);
+        console.log(addedNewCart);
+      }
 
-  } catch (error) {
-    console.error('Error adding item to cart: ', error);
-    res.status(500).json({ message: 'Error adding item to cart.' });
+    res
+      .status(201)
+      .json({ message: "Product added to cart" });
   }
-}   
+
+  // try {
+  // } catch (error) {
+  //   console.log('error==', error)
+    
+  // }
+
+    // try {
+
+    //   // let user = userRepo.findOne({where: {id: }})
+
+    //   let cart = await cartRepo.findOne({
+    //       where: { product: product }
+    //   })
+
+    //   //if cart is not present for the user, we'll create new one
+    //   if(!cart){
+    //     cart = new Cart();
+
+    //     // await cartRepo.save(cart);
+    //   }
+
+    //   res.status(200).json({ message: 'Item added to cart successfully!' });
+
+    // } catch (error) {
+    //   console.error('Error adding item to cart: ', error);
+    //   res.status(500).json({ message: 'Error adding item to cart.' });
+    // }
+  }
+

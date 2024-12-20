@@ -32,12 +32,13 @@ const Store = () => {
   const addItemHandler = async (item) => {
     const result = await axios.post('http://localhost:4000/cart', {
         product: item,
+    }, {
+      withCredentials: true,
     })
 
     if(result.status == 201){
       dispatch(addItemToCart( item ));
     }
-
   }
 
   return (

@@ -12,3 +12,21 @@ DATABASE DRIVER (postgres, sql etc)
 
 
 - by default all operations are asynchronous in typeORM
+-----------------------------------------------
+
+
+ relations in typeORM -
+
+ to make one to many relations
+
+//making one to many or many to one relation with the product db.
+//1st argument- cb with the db we are making connection with, 
+//2nd argument- cb which shows in which column of other db, we're going to make relation.
+
+//in the user entity
+ @OneToMany(() => Product, (product) => product.user)
+ cart: Cart[]
+
+//in the cart entity
+ @ManyToOne(() => User, (user) => user.cart)
+ user: User

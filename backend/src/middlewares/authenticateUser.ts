@@ -1,31 +1,27 @@
-import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
-import { AppDataSource } from '../data-source';
-import { Users } from '../entities/user';  
-
+import { NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 const JWT_SECRET = 'chickiwikichicki';
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
+
+    
+    // const token = req.cookies.jwt;
+    // console.log("token from authenticator",token);
+    
+
+    // if (!token) {
+    //     return res.sendStatus(403);
+    // }
+
     try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: 'No token provided' });
-        }
-
-        const token = authHeader.split(' ')[1];
-        console.log(token);
+         
+        // const data = jwt.verify(token, JWT_SECRET) as JwtPayload
+        // console.log('data from authenticate user,',data);
         
-        const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-        
-        const userRepo = AppDataSource.getRepository(Users);
-        const user = await userRepo.findOne({ where: { id: decoded.userId } });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        next();
+         //attaching the userId in the req object
+        next(); // prodceeding to the next middleware or router
     } catch (error) {
-        return res.status(401).json({ message: 'Invalid token' });
+        //  res.sendStatus(403);
     }
+
 };

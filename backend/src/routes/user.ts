@@ -33,7 +33,7 @@ router.route("/signup").post(handleCreateNewUser);
 //login request
 router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
 
-// .post(async (req, res) => {
+// .post(async (req, res) => { 
 //     //this is for, when we'll get the data from frontend
 //     // const {firstname, lastname, email} = req.body;
 

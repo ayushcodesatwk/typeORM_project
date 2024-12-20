@@ -4,6 +4,7 @@ import { AppDataSource } from "./data-source";
 import router from "./routes/user";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import session from 'express-session';
 
 const app = express();
 const port = 4000;
@@ -15,6 +16,12 @@ const corsOptions = {
 };
 
 //middlewares
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using HTTPS
+}));
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -31,4 +38,4 @@ AppDataSource.initialize()
   })
   .catch((error) => {
     console.error("Error connecting to the database:", error);
-  });
+  }); 

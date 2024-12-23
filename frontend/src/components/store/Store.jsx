@@ -28,7 +28,6 @@ const Store = () => {
     fetchProducts();
   }, []);
 
-
   const addItemHandler = async (item) => {
     const result = await axios.post('http://localhost:4000/cart', {
         product: item,
@@ -36,9 +35,9 @@ const Store = () => {
       withCredentials: true,
     })
 
-    if(result.status == 201){
-      dispatch(addItemToCart( item ));
-    }
+    console.log('addToCart result-- ', result);
+    
+    
   }
 
   return (
@@ -70,7 +69,7 @@ const Store = () => {
                 <p className="font-bold text-xl mt-4 m-3 text-[#333333]">
                   $ {item.price}
                 </p>
-              </Link>
+              </Link> 
               <button
                 onClick={() => addItemHandler(item)}
                 className="font-bold text-xl mt-4 m-3 p-3 bg-purple-900 text-white hover:bg-purple-700"

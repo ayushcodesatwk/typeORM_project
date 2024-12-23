@@ -3,11 +3,7 @@ import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import bcrypt from "bcrypt";
 import { createToken } from "../service/auth";
-import { Cart } from "../entities/cart";
-import requireAuth from "../middlewares/user";
-import { JwtPayload } from "jsonwebtoken";
-import jwtoken from "jsonwebtoken";
-import { Product } from "../entities/product";
+
 
 //creating a new user
 export const handleCreateNewUser = async (req: Request, res: Response) => {
@@ -79,9 +75,10 @@ export const handleUserLogin = async (req: Request, res: Response) => {
         const token = createToken({ id: user.id });
         console.log("token login-- 72-- ", token);
 
+        // cookie will get cleared after 30 mins
         res.cookie("jwt", token, {
           httpOnly: true,
-          maxAge: 15 * 60 * 1000,
+          maxAge: 30 * 60 * 1000,
           path: "/", // Specify the path (root path by default)
         });
 
@@ -112,105 +109,3 @@ export const logoutOnGetRequest = async (req: Request, res: Response) => {
   // }
   // return res.status(400).json({ msg: "No cookie found" });
 };
-
-
-
-// adding item to cart
-export const addItemToCart = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-
-  // middleware authenticates the user if loggedin
-  const cartRepo = AppDataSource.getRepository(Cart);
-  const userRepo = AppDataSource.getRepository(Users);
-  const productRepo = AppDataSource.getRepository(Product);
-
-  //getting the product details
-  const { product } = req.body;
-  const productId = product.id;
-
-
-  //getting the token to get logged in userId
-  const token = req.cookies.jwt;
-  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-  console.log("log the web token data", data);
-  const userId = data.id;
-
-  console.log("this is product--",product);
-
-  // const user = await userRepo.findOne({ where: { id: userId } });
-
-  const existingProduct = await cartRepo.findOne({
-    where: {
-      user: { id: userId },
-      product: { id: productId },
-    },
-    relations: ['user', 'product'],  // This ensures related entities are fetched
-  });
-
-  console.log("this is existing product --",existingProduct);
-
-  if (existingProduct) {
-
-    existingProduct.quantity += 1;
-
-    await cartRepo.save(existingProduct);
-
-    res.status(200).json({ msg: "Quantity Updated" });
-  
-    return;
-  
-  } else {
-
-    let cart = new Cart();
-
-    const product = await productRepo.findOne({ where: { id: productId } });
-
-    if (!product) {
-      res.status(404).json({ message: "Product not found" });
-    } 
-    else{
-        
-        cart.product = product;
-        cart.user = userId;
-        cart.quantity = 1;
-        const addedNewCart = await cartRepo.save(cart);
-        console.log(addedNewCart);
-      }
-
-    res
-      .status(201)
-      .json({ message: "Product added to cart" });
-  }
-
-  // try {
-  // } catch (error) {
-  //   console.log('error==', error)
-    
-  // }
-
-    // try {
-
-    //   // let user = userRepo.findOne({where: {id: }})
-
-    //   let cart = await cartRepo.findOne({
-    //       where: { product: product }
-    //   })
-
-    //   //if cart is not present for the user, we'll create new one
-    //   if(!cart){
-    //     cart = new Cart();
-
-    //     // await cartRepo.save(cart);
-    //   }
-
-    //   res.status(200).json({ message: 'Item added to cart successfully!' });
-
-    // } catch (error) {
-    //   console.error('Error adding item to cart: ', error);
-    //   res.status(500).json({ message: 'Error adding item to cart.' });
-    // }
-  }
-

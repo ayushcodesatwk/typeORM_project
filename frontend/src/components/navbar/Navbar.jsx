@@ -41,7 +41,7 @@ const Navbar = () => {
             </li>
             <li
               className="hover:bg-yellow-300 hover:text-gray-900 cursor-pointer p-2"
-              onClick={() => navigate("/cart")}
+              onClick={() => navigate("/cart", { state: { refresh: true }})}
             >
               Cart
             </li>

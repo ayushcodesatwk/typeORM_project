@@ -4,11 +4,13 @@ import { Users } from "../entities/user";
 import { Cart } from "../entities/cart";
 import { Product } from "../entities/product";
 import {
-  addItemToCart,
   handleCreateNewUser,
   handleUserLogin,
   logoutOnGetRequest,
 } from "../controllers/user";
+import { addItemToCart, deleteItemFromCart, fetchUserCart } from "../controllers/cart";
+
+
 
 const router = express.Router();
 
@@ -90,6 +92,6 @@ router.route("/store").get(async (req, res) => {
 
 
 //cart router
-router.route("/cart").post(addItemToCart)
+router.route("/cart").get(fetchUserCart).post(addItemToCart).delete(deleteItemFromCart)
 
 export default router;

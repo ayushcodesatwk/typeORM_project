@@ -3,6 +3,9 @@ import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import bcrypt from "bcrypt";
 import { createToken } from "../service/auth";
+import jwtoken from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
+
 
 
 //creating a new user
@@ -108,4 +111,26 @@ export const logoutOnGetRequest = async (req: Request, res: Response) => {
   //     return res.status(200).json({ msg: "Cookie cleared, user logged out" });
   // }
   // return res.status(400).json({ msg: "No cookie found" });
+};
+
+//user login check
+export const isLoginCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+
+     //getting the token to get logged in userId
+      const token = req.cookies.jwt;
+      const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+      console.log("isLoginCheck web token data--", data);
+
+      if(data.id){
+          res.status(200).json(true);
+          return 
+      }
+      else{
+          res.status(400).json(false);
+          return
+      }
 };

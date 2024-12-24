@@ -7,8 +7,9 @@ import {
   handleCreateNewUser,
   handleUserLogin,
   logoutOnGetRequest,
+  isLoginCheck
 } from "../controllers/user";
-import { addItemToCart, deleteItemFromCart, fetchUserCart } from "../controllers/cart";
+import { addItemToCart, deleteItemFromCart, fetchUserCart, minusOneItem, plusOneItem } from "../controllers/cart";
 
 
 
@@ -34,6 +35,9 @@ router.route("/signup").post(handleCreateNewUser);
 
 //login request
 router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
+
+//login check
+router.route("/is-login").get(isLoginCheck)
 
 // .post(async (req, res) => { 
 //     //this is for, when we'll get the data from frontend
@@ -83,6 +87,7 @@ router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
 
 //store router
 router.route("/store").get(async (req, res) => {
+  
   const productRepo = AppDataSource.getRepository(Product);
 
   const allProducts = await productRepo.find({});
@@ -90,8 +95,13 @@ router.route("/store").get(async (req, res) => {
   res.json(allProducts);
 });
 
-
 //cart router
-router.route("/cart").get(fetchUserCart).post(addItemToCart).delete(deleteItemFromCart)
+router.route("/cart").get(fetchUserCart).post(addItemToCart).delete(deleteItemFromCart);
+
+//increase quantity by one
+router.route("/plus-one").get(plusOneItem);
+
+//decrease quantity by one
+router.route("/minus-one").get(minusOneItem);
 
 export default router;

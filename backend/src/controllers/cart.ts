@@ -13,9 +13,7 @@ export const addItemToCart = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // middleware authenticates the user if loggedin
   const cartRepo = AppDataSource.getRepository(Cart);
-  const userRepo = AppDataSource.getRepository(Users);
   const productRepo = AppDataSource.getRepository(Product);
 
   //getting the product details
@@ -37,7 +35,7 @@ export const addItemToCart = async (
       user: { id: userId },
       product: { id: productId },
     },
-    relations: ["user", "product"], // This ensures related entities are fetched
+    relations: ["user", "product"], // this ensures related entities are fetched
   });
 
   console.log("this is existing product --", existingProduct);
@@ -47,7 +45,12 @@ export const addItemToCart = async (
 
     await cartRepo.save(existingProduct);
 
-    res.status(200).json({ msg: "Quantity Updated" });
+    const cartArray = await cartRepo.find({
+      where: { user: { id: userId }, product: { id: productId } },
+      relations: ["user", "product"],
+    });
+
+    res.status(200).json(cartArray);
 
     return;
   } else {
@@ -61,8 +64,8 @@ export const addItemToCart = async (
       cart.product = product;
       cart.user = userId;
       cart.quantity = 1;
-      const addedNewCart = await cartRepo.save(cart);
-      console.log(addedNewCart);
+      const addedNewCartItem = await cartRepo.save(cart);
+      console.log("new cart added--", addedNewCartItem);
     }
 
     res.status(201).json({ message: "Product added to cart" });
@@ -83,37 +86,36 @@ export const fetchUserCart = async (
   //getting the token to get logged in userId
   const token = req.cookies.jwt;
 
-  if(token){
-      const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-      console.log("log the web token data", data);
-      const userId = data.id;
+  if (token) {
+    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+    console.log("log the web token data", data);
+    const userId = data.id;
 
-      console.log('userId from cart--', userId);
+    console.log("userId from cart--", userId);
 
-      try {
-        if (!userId) {
-          
-          res.status(401).json({ msg: "Internal server error" });
-          return;
+    try {
+      if (!userId) {
+        res.status(401).json({ msg: "Internal server error" });
+        return;
+      } else {
+        const cartArray = await cartRepo.find({
+          where: { user: { id: userId } },
+          relations: ["product", "user"],
+        });
 
-        } else {
+        console.log("loggedin user's cart array- ", cartArray);
 
-          const cartArray = await cartRepo.find({ where: { user: userId },  relations: ["product", "user"] });
-    
-          console.log("loggedin user's cart array- ", cartArray);
-    
-          res.status(201).json(cartArray);
-    
-          return;
-        }
-      } 
-      catch (error) {
-        res.status(401).json({ msg: "ERROR FETCHING USER CART", error });
+        res.status(201).json(cartArray);
+
         return;
       }
-    } else{
-    res.status(400).json({msg: "USER NOT FOUND: PLEASE LOGIN"})
-    return
+    } catch (error) {
+      res.status(401).json({ msg: "ERROR FETCHING USER CART", error });
+      return;
+    }
+  } else {
+    res.status(400).json({ msg: "USER NOT FOUND: PLEASE LOGIN" });
+    return;
   }
 };
 
@@ -131,32 +133,128 @@ export const deleteItemFromCart = async (
 
   if (!cartId) {
     res.status(400).json({ message: "Product Id is required." });
-    return
+    return;
   }
 
-
-  
   const deleteItem = await AppDataSource.createQueryBuilder()
     .delete()
     .from(Cart)
     .where("cartId = :cartId", { cartId: cartId })
     .execute();
 
+  if (deleteItem.affected === 0) {
+    res.status(404).json({ message: "Product not found in cart." });
+    return;
+  }
 
-    if (deleteItem.affected === 0) {
-      res.status(404).json({ message: "Product not found in cart." });
-      return
-    }
+  console.log("DeletedITEM", deleteItem);
 
-    console.log("DeletedITEM", deleteItem);
-
-    res.status(200).json({ message: "Product Deleted" });
-    return
+  res.status(200).json({ message: "Product Deleted" });
+  return;
 };
 
-// remove one item
-export const removeOneItem = async (
+// minus one item
+export const minusOneItem = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {};
+): Promise<void> => {
+  //mujhe kya karna hai --       userRepo lo, cartRepo lo, ==> check for the token and userId   cartrepo se cartdata nikalo using cartId & userId
+  // check if quantity is one, if it is to remove kar do otherwise is cartData me quantity -= 1 kar do,
+
+  const { cartId } = req.body;
+
+  //getting the token to get logged in userId
+  const token = req.cookies.jwt;
+  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+  console.log("log the web token data", data);
+  const userId = data.id;
+
+  const cartRepo = AppDataSource.getRepository(Cart);
+
+  const existingProduct = await cartRepo.findOne({
+    where: { user: { id: userId }, cartId: cartId },
+    relations: ["user", "product"],
+  });
+
+  console.log("cartItem from minusOne--", existingProduct);
+
+  if (existingProduct) {
+
+    //if quantity is one delete it
+    if (existingProduct.quantity == 1) {
+      const deleteItem = await AppDataSource.createQueryBuilder()
+        .delete()
+        .from(Cart)
+        .where("cartId = :cartId", { cartId: cartId })
+        .execute();
+
+      if (deleteItem.affected === 0) {
+        res.status(404).json({ message: "Product not found in cart." });
+        return;
+      }
+
+      console.log("DeletedITEM--", deleteItem);
+  
+      res.status(200).json({msg: "deleted from cart"});
+  
+      return;
+    }
+
+    //otherwise just reduce quantity by one
+    existingProduct.quantity -= 1;
+
+    await cartRepo.save(existingProduct);
+
+    const cartArray = await cartRepo.find({
+      where: { user: { id: userId } },
+      relations: ["user", "product"],
+    });
+
+    res.status(200).json(cartArray);
+
+    return;
+  }
+};
+
+// plus one item
+export const plusOneItem = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+
+  const { cartId } = req.body;
+
+  //getting the token to get logged in userId
+  const token = req.cookies.jwt;
+  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+  console.log("log the web token data", data);
+  const userId = data.id;
+
+  const cartRepo = AppDataSource.getRepository(Cart);
+
+  const existingProduct = await cartRepo.findOne({
+    where: { user: { id: userId }, cartId: cartId },
+    relations: ["user", "product"],
+  });
+
+  console.log("cartItem from plusOne--", existingProduct);
+
+  if (existingProduct) {
+
+    existingProduct.quantity += 1;
+
+    await cartRepo.save(existingProduct);
+
+    const cartArray = await cartRepo.find({
+      where: { user: { id: userId } },
+      relations: ["user", "product"],
+    });
+
+    res.status(200).json(cartArray);
+
+    return;
+  }
+
+};

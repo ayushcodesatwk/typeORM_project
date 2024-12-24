@@ -6,6 +6,9 @@ import {
   deleteItemFromCart,
 } from "../../store/slices/cartSlice";
 import { totalAmount } from "../../store/slices/cartSlice";
+import { plusOne, minusOne } from "../../store/slices/cartSlice";
+
+
 
 const Cart = () => {
   const cartArray = useSelector((state) => state.cart.cartArray);
@@ -32,35 +35,60 @@ const Cart = () => {
     }
   };
 
-  //fetching cart from db
+  //fetching cart Item as per logged in userid
+  const fetchCartItem = async () => {
+    try {
+      const result = await axios.get("http://localhost:4000/cart", {
+        withCredentials: true,
+      });
+
+      console.log("cart Data: ", result.data);
+
+      dispatch(addAllItemsToCart(result.data));
+      
+      dispatch(totalAmount());
+
+    } catch (error) {
+      console.error("Error fetching cart products: ", error.message);
+    }
+  };
   useEffect(() => {
-    const fetchCartItem = async () => {
-      try {
-        const result = await axios.get("http://localhost:4000/cart", {
-          withCredentials: true,
-        });
-
-        console.log("cart Data: ", result.data);
-
-        for (let i = 0; i < result.data.length; i++) {
-          dispatch(addAllItemsToCart(result.data[i]));
-        }
-
-        dispatch(totalAmount());
-      } catch (error) {
-        console.error("Error fetching cart products: ", error.message);
-      }
-    };
-
     fetchCartItem();
-  },[]);
+  },[cartArray]);
 
-  console.log("cart array-", cartArray);
+
+  const plusOne = async (cartId) => {
+
+    const result = await axios.get("http://localhost:4000/plus-one", {
+      data: {
+        cartId: cartId
+      }, 
+      withCredentials: true
+    })
+
+    console.log("result from plusOne--", result);
+    dispatch(plusOne(result.data));
+  } 
+
+  const minusOne = async (cartId) => {
+    
+    const result = await axios.get("http://localhost:4000/minus-one", {
+      data: {
+        cartId: cartId
+      },
+      withCredentials:true
+    })
+
+
+    console.log('result status minusOne--', result);
+    dispatch(minusOne(result.data));
+  
+  }
   
 
   return (
     <>
-      <div className=" pt-10  bg-gray-900">
+      <div className=" pt-10 min-h-screen bg-gray-900">
         <h1 className="text-center font-bold text-5xl text-yellow-400">
           Your Cart
         </h1>
@@ -86,17 +114,17 @@ const Cart = () => {
                         {(item.product.price * item.quantity).toFixed(2)}
                       </p>
                       <p className="mt-3 font-bold">
-                        <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l">
+                        <button onClick={() => plusOne(item.cartId)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300">
                           +
                         </button>
-                        <button className="bg-white hover:bg-gray-200 text-black font-bold py-2 px-4 rounded-r">
+                        <button onClick={() => minusOne(item.cartId)} className="bg-white hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-r hover:scale-105 transition-transform duration-300">
                           -
                         </button>
                       </p>
                     </div>
                     <button
                       onClick={() => deleteItemHandler(item.cartId)}
-                      className="pr-4 pl-4 h-1/3 bg-white text-black  hover:bg-red-700 hover:text-white"
+                      className="pr-4 pl-4 h-1/3 bg-white text-black  hover:bg-red-700 hover:text-white hover:scale-110 transition-transform duration-300"
                     >
                       remove
                     </button>
@@ -106,7 +134,7 @@ const Cart = () => {
             </div>
           ))
         ) : (
-          <h1 className="font-bold text-4xl text-center mt-5 text-stone-500">
+          <h1 className="font-bold text-4xl text-center mt-5 text-yellow-400">
             is empty
           </h1>
         )}

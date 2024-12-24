@@ -1,18 +1,23 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { handleLogout, handleLogin } from "../../store/slices/authSlice";
+import { handleLogout } from "../../store/slices/authSlice";
 import axios from "axios";
+import { clearCartOnLogout } from "../../store/slices/cartSlice";
+
+
 
 const Navbar = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  //login
   const loginHandler = () => {
     navigate("/login");
   };
 
+  //logout
   const logoutHandler = async () => {
     dispatch(handleLogout());
     //always set withCredentials to true
@@ -20,11 +25,13 @@ const Navbar = () => {
       withCredentials: true,
     });
     if(result.status == 200){
-        navigate("/login")
+        navigate("/login");
+        dispatch(clearCartOnLogout());
         console.log("logout result--", result);
-    }
+    };
     return
-  };
+  };  
+
 
   return (
     <>

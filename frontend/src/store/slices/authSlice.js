@@ -20,12 +20,20 @@ const authSlice = createSlice({
         }
     },
 
+    setIsLoginUsingToken: (state, action) => {
+
+      const isLogIn = action.payload;
+
+      state.isLoggedIn = isLogIn;
+      
+    },
+
     loginSignupSwitchHandler: (state) => {
         state.loginSignupSwitch = !state.loginSignupSwitch;
     }
   },
 });
 
-export const { handleLogout, handleLogin, loginSignupSwitchHandler } = authSlice.actions;
+export const { handleLogout, handleLogin, loginSignupSwitchHandler, setIsLoginUsingToken } = authSlice.actions;
 
 export default authSlice.reducer;

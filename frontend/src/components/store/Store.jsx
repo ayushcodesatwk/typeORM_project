@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addAllItems } from "../../store/slices/storeSlice";
-import {addItemToCart } from "../../store/slices/cartSlice"
+import {addAllItemsToCart, addItemToCart } from "../../store/slices/cartSlice"
 import { Link } from "react-router-dom";
 
 const Store = () => {
-  const totalItems = useSelector((state) => state.store.totalItems);
   const storeArray = useSelector((state) => state.store.storeArr);
   const dispatch = useDispatch();
 
@@ -16,7 +15,7 @@ const Store = () => {
       try {
         const result = await axios.get("http://localhost:4000/store");
         console.log("Data: ", result);
-
+ 
         for (let i = 0; i < result.data.length; i++) {
           dispatch(addAllItems(result.data[i]));
         }
@@ -28,6 +27,8 @@ const Store = () => {
     fetchProducts();
   }, []);
 
+
+  //add item to cart if it doesn't exists
   const addItemHandler = async (item) => {
     const result = await axios.post('http://localhost:4000/cart', {
         product: item,
@@ -35,9 +36,10 @@ const Store = () => {
       withCredentials: true,
     })
 
-    console.log('addToCart result-- ', result);
-    
-    
+    if(result.status === 200){
+      console.log('addToCart result-- ', result);
+      dispatch(addAllItemsToCart(result.data));
+    }
   }
 
   return (

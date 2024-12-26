@@ -5,7 +5,6 @@ import jwtoken from "jsonwebtoken";
 import { Product } from "../entities/product";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source";
-import { Users } from "../entities/user";
 
 // adding item to cart
 export const addItemToCart = async (
@@ -65,7 +64,7 @@ export const addItemToCart = async (
       cart.user = userId;
       cart.quantity = 1;
       const addedNewCartItem = await cartRepo.save(cart);
-      console.log("new cart added--", addedNewCartItem);
+      console.log("new product added to cart--", addedNewCartItem);
     }
 
     res.status(201).json({ message: "Product added to cart" });
@@ -159,8 +158,8 @@ export const minusOneItem = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  //mujhe kya karna hai --       userRepo lo, cartRepo lo, ==> check for the token and userId   cartrepo se cartdata nikalo using cartId & userId
-  // check if quantity is one, if it is to remove kar do otherwise is cartData me quantity -= 1 kar do,
+  //what I have to do here --       token lo, cartRepo lo, ==> check for the token and userId   cartrepo se cartdata nikalo using cartId & userId
+  // check if quantity is one, if it is one then remove kar do otherwise is cartData me quantity -= 1 kar do,
 
   const { cartId } = req.body;
 
@@ -180,15 +179,15 @@ export const minusOneItem = async (
   console.log("cartItem from minusOne--", existingProduct);
 
   if (existingProduct) {
-
+ 
     //if quantity is one delete it
     if (existingProduct.quantity == 1) {
       const deleteItem = await AppDataSource.createQueryBuilder()
         .delete()
         .from(Cart)
-        .where("cartId = :cartId", { cartId: cartId })
+        .where("cartId = :cartId", { cartId: existingProduct.cartId })
         .execute();
-
+ 
       if (deleteItem.affected === 0) {
         res.status(404).json({ message: "Product not found in cart." });
         return;
@@ -200,20 +199,22 @@ export const minusOneItem = async (
   
       return;
     }
+    else{
+      //otherwise just reduce quantity by one
+      existingProduct.quantity -= 1;
+  
+      await cartRepo.save(existingProduct);
+  
+      const cartArray = await cartRepo.find({
+        where: { user: { id: userId } },
+        relations: ["user", "product"],
+      });
+  
+      res.status(200).json(cartArray);
+  
+      return;
 
-    //otherwise just reduce quantity by one
-    existingProduct.quantity -= 1;
-
-    await cartRepo.save(existingProduct);
-
-    const cartArray = await cartRepo.find({
-      where: { user: { id: userId } },
-      relations: ["user", "product"],
-    });
-
-    res.status(200).json(cartArray);
-
-    return;
+    }
   }
 };
 
@@ -228,33 +229,42 @@ export const plusOneItem = async (
 
   //getting the token to get logged in userId
   const token = req.cookies.jwt;
-  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-  console.log("log the web token data", data);
-  const userId = data.id;
 
-  const cartRepo = AppDataSource.getRepository(Cart);
+  console.log('tokn from cart plusone---', token, cartId);
+  
 
-  const existingProduct = await cartRepo.findOne({
-    where: { user: { id: userId }, cartId: cartId },
-    relations: ["user", "product"],
-  });
+  if(token){
 
-  console.log("cartItem from plusOne--", existingProduct);
-
-  if (existingProduct) {
-
-    existingProduct.quantity += 1;
-
-    await cartRepo.save(existingProduct);
-
-    const cartArray = await cartRepo.find({
-      where: { user: { id: userId } },
+    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+    console.log("log the web token data", data);
+    const userId = data.id;
+  
+    const cartRepo = AppDataSource.getRepository(Cart);
+  
+    console.log("CARTiD- from plusOne--", cartId);
+  
+    const existingProduct = await cartRepo.findOne({
+      where: { user: { id: userId }, cartId: cartId },
       relations: ["user", "product"],
     });
-
-    res.status(200).json(cartArray);
-
-    return;
+  
+    console.log("cartItem from plusOne--", existingProduct);
+  
+    if (existingProduct) {
+  
+      existingProduct.quantity += 1;
+  
+      await cartRepo.save(existingProduct);
+  
+      const cartArray = await cartRepo.find({
+        where: { user: { id: userId } },
+        relations: ["user", "product"],
+      });
+  
+      res.status(200).json(cartArray);
+  
+      return;
+    }
   }
 
 };

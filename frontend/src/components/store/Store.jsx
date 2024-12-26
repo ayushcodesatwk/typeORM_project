@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { addAllItems } from "../../store/slices/storeSlice";
 import {addAllItemsToCart, addItemToCart } from "../../store/slices/cartSlice"
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Store = () => {
   const storeArray = useSelector((state) => state.store.storeArr);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   //get the data from backend
   useEffect(() => {
@@ -30,16 +32,26 @@ const Store = () => {
 
   //add item to cart if it doesn't exists
   const addItemHandler = async (item) => {
-    const result = await axios.post('http://localhost:4000/cart', {
-        product: item,
-    }, {
-      withCredentials: true,
-    })
 
-    if(result.status === 200){
-      console.log('addToCart result-- ', result);
-      dispatch(addAllItemsToCart(result.data));
+    const isLogin = await axios.get('http://localhost:4000/is-login')
+
+    if(isLogin.data){
+
+        const result = await axios.post('http://localhost:4000/cart', {
+            product: item,
+        }, {
+          withCredentials: true,
+        })
+    
+        if(result.status === 200){
+          console.log('addToCart result-- ', result);
+          dispatch(addAllItemsToCart(result.data));
+        }
+    }else{
+        alert("Please login before adding items...");
+        navigate("/login");
     }
+
   }
 
   return (

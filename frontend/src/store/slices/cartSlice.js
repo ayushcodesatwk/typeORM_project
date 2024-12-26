@@ -96,38 +96,36 @@ const cartSlice = createSlice({
     },
 
     plusOne: (state, action) => {
+
       const cartId = action.payload;
 
-      state.cartArray.map((item) => {
-        if (item.cartId == cartId) {
+       state.cartArray.forEach((item) => {
+        
+        if (item.cartId === cartId) {
           item.quantity += 1;
-        }
-      });
+          }
+        });
     },
 
     minusOne: (state, action) => {
       const cartId = action.payload;
 
-      state.cartArray = state.cartArray.map((item) => {
-        if (item.cartId === cartId) {
-          if (item.quantity === 1) {
-            
-            const updatedCart = state.cartArray.filter(
-              (product) => product.cartId !== cartId
-            );
+      state.cartArray = state.cartArray.reduce((acc, curr) => {
 
-            return {
-            ...state,
-            cartArray: updatedCart,
-            };
+        if(curr.cartId == cartId){
+            if(curr.quantity > 1){
 
-          } else {
-            item.quantity -= 1;
-
-            return {...state}
+              acc.push({...curr, quantity: curr.quantity - 1})
+            }
           }
-        }
-      });
+        
+        else{
+            acc.push(curr);
+          }
+
+        return acc;
+
+      }, [])
     },
   },
 });

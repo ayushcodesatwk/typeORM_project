@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,7 +7,6 @@ import {
 } from "../../store/slices/cartSlice";
 import { totalAmount } from "../../store/slices/cartSlice";
 import { plusOne, minusOne } from "../../store/slices/cartSlice";
-
 
 
 const Cart = () => {
@@ -54,35 +53,57 @@ const Cart = () => {
   };
   useEffect(() => {
     fetchCartItem();
-  },[cartArray]);
+  },[]);
 
 
-  const plusOne = async (cartId) => {
+  //increase quantity by one 
+  const plusOneClick = async (cartId) => {
 
-    const result = await axios.get("http://localhost:4000/plus-one", {
-      data: {
-        cartId: cartId
-      }, 
-      withCredentials: true
-    })
-
-    console.log("result from plusOne--", result);
-    dispatch(plusOne(result.data));
-  } 
-
-  const minusOne = async (cartId) => {
+    console.log('cartId from cartJSX PLUSCLICK-', cartId);
     
-    const result = await axios.get("http://localhost:4000/minus-one", {
-      data: {
-        cartId: cartId
-      },
-      withCredentials:true
-    })
+    
+    try{
+        const result = await axios.put("http://localhost:4000/plus-one", 
+         { cartId: cartId }, 
+         { withCredentials: true}
+        );
+
+        console.log("result from plusOne--", result);
+    
+        if (result.status === 200) {
+          dispatch(plusOne(cartId));
+          dispatch(totalAmount());
+        }
+
+    } catch (error) {
+      console.error("Error deleting item:", error.message);
+    }
+  };
+
+  console.log("Cart.jsx RENDERED", cartArray);
+
+  //reduce quantity by one
+  const minusOneClick = async (cartId) => {
+
+    console.log('cartId from cartJSX MINUSCLICK-', cartId);
 
 
-    console.log('result status minusOne--', result);
-    dispatch(minusOne(result.data));
+    try{
+      const result = await axios.put("http://localhost:4000/minus-one", 
+        { cartId: cartId }, 
+        { withCredentials: true}
+       );
   
+      console.log('result status minusOne--', result);
+      
+      if(result.status === 200){
+          dispatch(minusOne(cartId));
+          dispatch(totalAmount());
+      }
+
+    } catch (error) {
+      console.error("Error deleting item:", error.message);
+    }
   }
   
 
@@ -114,10 +135,10 @@ const Cart = () => {
                         {(item.product.price * item.quantity).toFixed(2)}
                       </p>
                       <p className="mt-3 font-bold">
-                        <button onClick={() => plusOne(item.cartId)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300">
+                        <button onClick={() => plusOneClick(item.cartId)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300">
                           +
                         </button>
-                        <button onClick={() => minusOne(item.cartId)} className="bg-white hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-r hover:scale-105 transition-transform duration-300">
+                        <button onClick={() => minusOneClick(item.cartId)} className="bg-white hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-r hover:scale-105 transition-transform duration-300">
                           -
                         </button>
                       </p>

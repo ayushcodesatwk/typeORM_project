@@ -1,17 +1,22 @@
 import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
-import { Cart } from "../entities/cart";
 import { Product } from "../entities/product";
+
 import {
   handleCreateNewUser,
   handleUserLogin,
   logoutOnGetRequest,
-  isLoginCheck
+  isLoginCheck,
 } from "../controllers/user";
-import { addItemToCart, deleteItemFromCart, fetchUserCart, minusOneItem, plusOneItem } from "../controllers/cart";
 
-
+import {
+  addItemToCart,
+  deleteItemFromCart,
+  fetchUserCart,
+  minusOneItem,
+  plusOneItem,
+} from "../controllers/cart";
 
 const router = express.Router();
 
@@ -37,9 +42,9 @@ router.route("/signup").post(handleCreateNewUser);
 router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
 
 //login check
-router.route("/is-login").get(isLoginCheck)
+router.route("/is-login").get(isLoginCheck);
 
-// .post(async (req, res) => { 
+// .post(async (req, res) => {
 //     //this is for, when we'll get the data from frontend
 //     // const {firstname, lastname, email} = req.body;
 
@@ -87,7 +92,6 @@ router.route("/is-login").get(isLoginCheck)
 
 //store router
 router.route("/store").get(async (req, res) => {
-  
   const productRepo = AppDataSource.getRepository(Product);
 
   const allProducts = await productRepo.find({});
@@ -96,12 +100,16 @@ router.route("/store").get(async (req, res) => {
 });
 
 //cart router
-router.route("/cart").get(fetchUserCart).post(addItemToCart).delete(deleteItemFromCart);
+router
+  .route("/cart")
+  .get(fetchUserCart)
+  .post(addItemToCart)
+  .delete(deleteItemFromCart);
 
 //increase quantity by one
-router.route("/plus-one").get(plusOneItem);
+router.route("/plus-one").put(plusOneItem);
 
 //decrease quantity by one
-router.route("/minus-one").get(minusOneItem);
+router.route("/minus-one").put(minusOneItem);
 
 export default router;

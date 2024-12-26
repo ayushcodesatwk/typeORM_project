@@ -122,15 +122,21 @@ export const isLoginCheck = async (
 
      //getting the token to get logged in userId
       const token = req.cookies.jwt;
-      const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-      console.log("isLoginCheck web token data--", data);
 
-      if(data.id){
-          res.status(200).json(true);
-          return 
+      if(token){
+        const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+        console.log("isLoginCheck web token data--", data);
+  
+        if(data.id){
+            res.status(200).json(true);
+            return 
+        }
+        else{
+            res.status(400).json(false);
+            return
+        }
       }
-      else{
-          res.status(400).json(false);
-          return
-      }
+
+      res.status(400).json(false);
+      return
 };

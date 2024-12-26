@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addAllItems } from "../../store/slices/storeSlice";
-import {addAllItemsToCart, addItemToCart } from "../../store/slices/cartSlice"
+import { addAllItemsToCart } from "../../store/slices/cartSlice";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-const Store = () => {
+const Store = ({clickFunc}) => {
   const storeArray = useSelector((state) => state.store.storeArr);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Store = () => {
       try {
         const result = await axios.get("http://localhost:4000/store");
         console.log("Data: ", result);
- 
+
         for (let i = 0; i < result.data.length; i++) {
           dispatch(addAllItems(result.data[i]));
         }
@@ -29,34 +29,48 @@ const Store = () => {
     fetchProducts();
   }, []);
 
-
   //add item to cart if it doesn't exists
   const addItemHandler = async (item) => {
+    try {
+      const isLogin = await axios.get("http://localhost:4000/is-login", {
+        withCredentials: true,
+      });
 
-    const isLogin = await axios.get('http://localhost:4000/is-login')
+      console.log("isLogin from store", isLogin);
 
-    if(isLogin.data){
-
-        const result = await axios.post('http://localhost:4000/cart', {
+      if (isLogin.data) {
+        const result = await axios.post(
+          "http://localhost:4000/cart",
+          {
             product: item,
-        }, {
-          withCredentials: true,
-        })
-    
-        if(result.status === 200){
-          console.log('addToCart result-- ', result);
-          dispatch(addAllItemsToCart(result.data));
-        }
-    }else{
-        alert("Please login before adding items...");
-        navigate("/login");
-    }
+          },
+          {
+            withCredentials: true,
+          }
+        );
 
-  }
+        console.log('RESULT FROM ADDTOCART-',result);
+        
+
+        if (result.status === 200) {
+          console.log("addToCart result-- ", result);
+          dispatch(addAllItemsToCart(result.data));
+          clickFunc("Item added to cart!");
+        }
+        else if(result.status === 201){
+          clickFunc("Item added to cart!");
+        }
+      }
+    } catch (error) {
+      alert("Please login before adding items...");
+      navigate("/login");
+      return console.error("Error adding item to cart--", error);
+    }
+  };
 
   return (
-    <>  
-       <div className="flex bg-gray-900 ">
+    <>
+      <div className="flex bg-gray-900 ">
         {/* <ProductFilter/
           selectedCat={checkedItems}
           checkHandler={(name, checked) => checkCategoryHandler(name, checked)}
@@ -74,8 +88,8 @@ const Store = () => {
                     alt="item-image"
                     className="w-full h-full object-cover"
                   />
-                </Link>       
-              </div>  
+                </Link>
+              </div>
               <Link to={`/store/${item.id}`}>
                 <p className="m-3 text-gray-700">{item.title}</p>
               </Link>
@@ -83,7 +97,7 @@ const Store = () => {
                 <p className="font-bold text-xl mt-4 m-3 text-[#333333]">
                   $ {item.price}
                 </p>
-              </Link> 
+              </Link>
               <button
                 onClick={() => addItemHandler(item)}
                 className="font-bold text-xl mt-4 m-3 p-3 bg-purple-900 text-white hover:bg-purple-700"

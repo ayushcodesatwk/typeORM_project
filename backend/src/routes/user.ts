@@ -2,6 +2,7 @@ import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import { Product } from "../entities/product";
+import { searchItemInProductTable } from "../controllers/store";
 
 import {
   handleCreateNewUser,
@@ -91,13 +92,7 @@ router.route("/is-login").get(isLoginCheck);
 // })
 
 //store router
-router.route("/store").get(async (req, res) => {
-  const productRepo = AppDataSource.getRepository(Product);
-
-  const allProducts = await productRepo.find({});
-
-  res.json(allProducts);
-});
+router.route("/store").get(searchItemInProductTable);
 
 //cart router
 router
@@ -111,5 +106,8 @@ router.route("/plus-one").put(plusOneItem);
 
 //decrease quantity by one
 router.route("/minus-one").put(minusOneItem);
+
+//search item in the product table
+router.route("/search").get(searchItemInProductTable)
 
 export default router;

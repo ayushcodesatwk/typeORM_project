@@ -24,11 +24,24 @@ const storeSlice = createSlice({
         }, 
         totalCount: (state) => {
             state.totalItem = state.storeArr.length;
+        },
+
+        filterItemSearch: (state, action) => {
+            const itemText = action.payload;
+
+            state.storeArr = state.storeArr.reduce((acc, curr) => {
+    
+                if(curr.title.trim().toLowerCase().includes(itemText.trim().toLowerCase())){
+                    acc.push(curr);
+                }
+                
+                return acc;
+            }, []);
+
         }
     }
 })
 
-export const { addAllItems, addItemToCart } = storeSlice.actions;
-
+export const { addAllItems, addItemToCart, filterItemSearch} = storeSlice.actions;
 
 export default storeSlice.reducer;

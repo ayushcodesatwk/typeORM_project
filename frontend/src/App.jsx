@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
-import ProductPage from "./components/productpage/ProductPage";
+import ProductPage from "./components/product-page/ProductPage";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 
 function App() {

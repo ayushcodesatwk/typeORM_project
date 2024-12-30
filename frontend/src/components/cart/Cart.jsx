@@ -109,7 +109,7 @@ const Cart = () => {
 
   return (
     <>
-      <div className=" pt-10 min-h-screen bg-gray-900">
+      <div className=" pt-28 min-h-screen bg-gray-900">
         <h1 className="text-center font-bold text-5xl text-yellow-400">
           Your Cart
         </h1>

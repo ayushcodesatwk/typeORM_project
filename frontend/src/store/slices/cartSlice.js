@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   cartArray: [],
   amount: 0,
+  totalItemsInCart: 0,
 };
 
 const cartSlice = createSlice({
@@ -11,6 +12,8 @@ const cartSlice = createSlice({
   reducers: {
     addAllItemsToCart: (state, action) => {
       const cartArray = action.payload;
+
+      state.totalItemsInCart = state.cartArray.length;
 
       // console.log("product array from cart-", cartArray);
 
@@ -58,25 +61,23 @@ const cartSlice = createSlice({
           }
         }
       });
+
+      state.totalItemsInCart = state.cartArray.length;
+
     },
 
     clearCartOnLogout: (state) => {
-      console.log("cartArray just before logout-- ", state.cartArray);
-
-      return { ...state, cartArray: [] };
+      return { ...state, cartArray: [], totalItemsInCart: 0 };
     },
 
     deleteItemFromCart: (state, action) => {
       const productId = action.payload;
 
-      const updatedCart = state.cartArray.filter(
+      state.cartArray = state.cartArray.filter(
         (product) => product.cartId !== productId
       );
 
-      return {
-        ...state,
-        cartArray: updatedCart,
-      };
+      state.totalItemsInCart = state.cartArray.length;
     },
 
     totalAmount: (state) => {
@@ -105,6 +106,9 @@ const cartSlice = createSlice({
           item.quantity += 1;
           }
         });
+
+      state.totalItemsInCart = state.cartArray.length;
+
     },
 
     minusOne: (state, action) => {
@@ -126,6 +130,8 @@ const cartSlice = createSlice({
         return acc;
 
       }, [])
+
+      state.totalItemsInCart = state.cartArray.length;
     },
   },
 });

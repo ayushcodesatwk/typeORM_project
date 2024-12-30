@@ -1,6 +1,4 @@
 import { Product } from "../entities/product";
-import { JwtPayload } from "jsonwebtoken";
-import jwtoken from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source";
 
@@ -30,3 +28,42 @@ export const searchItemInProductTable = async (
     });
   }
 };
+
+export const filterProductsByCategoryAndPrice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const category = req.query.category ? String(req.query.category) : "";
+    const sortByPrice = req.query.priceCategory ? String(req.query.priceCategory) : "";
+
+    const productRepo = AppDataSource.getRepository(Product);
+    
+    const queryOptions: any = {
+        where: {},
+        order: {},
+    }
+
+    if(category){
+        queryOptions.where.category = category
+    }
+
+    if(sortByPrice === "asc" || sortByPrice === "desc"){
+        queryOptions.order.price = sortByPrice
+    }
+
+    const filteredProducts = await productRepo.find(queryOptions);
+
+    res.status(200).json(filteredProducts);
+  
+  } catch (error) {
+    console.error("Error fetching products:", error);
+
+    res.status(500).json({
+        message: "An error occurred while fetching products.",
+        error: error instanceof Error ? error.message : "Unknown error"
+    });
+  }    
+
+}

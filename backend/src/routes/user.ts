@@ -2,7 +2,10 @@ import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import { Product } from "../entities/product";
-import { searchItemInProductTable } from "../controllers/store";
+import {
+  filterProductsByCategoryAndPrice,
+  searchItemInProductTable,
+} from "../controllers/store";
 
 import {
   handleCreateNewUser,
@@ -108,6 +111,9 @@ router.route("/plus-one").put(plusOneItem);
 router.route("/minus-one").put(minusOneItem);
 
 //search item in the product table
-router.route("/search").get(searchItemInProductTable)
+router.route("/search").get(searchItemInProductTable);
+
+//filterProducts
+router.route("/filter").get(filterProductsByCategoryAndPrice);
 
 export default router;

@@ -26,6 +26,12 @@ const storeSlice = createSlice({
             state.totalItem = state.storeArr.length;
         },
 
+        removeAllItems: (state) => {
+            return {
+                ...state, storeArr: []
+            }
+        },
+
         filterItemSearch: (state, action) => {
             const itemText = action.payload;
 
@@ -42,6 +48,6 @@ const storeSlice = createSlice({
     }
 })
 
-export const { addAllItems, addItemToCart, filterItemSearch} = storeSlice.actions;
+export const { addAllItems, addItemToCart, filterItemSearch, removeAllItems} = storeSlice.actions;
 
 export default storeSlice.reducer;

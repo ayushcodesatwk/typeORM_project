@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
 import ProductPage from "./components/product-page/ProductPage";
 import { Bounce, ToastContainer, toast } from "react-toastify";
+import UploadProduct from "./components/product-uploader/UploadProduct";
 
 function App() {
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ function App() {
           <Route path="/*" element={<Store clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/store/:productId" element={<ProductPage clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/uploadProduct" element={<UploadProduct />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/about" element={<About />} />
         </Routes>

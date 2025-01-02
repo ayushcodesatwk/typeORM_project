@@ -20,11 +20,11 @@ const ProductFilter = ({checkHandler}) => {
 
   return (
     <>
-      <div className="w-1/5 min-w-[300px] fixed h-fit p-8 pt-3 ml-10 border-4 bg-purple-50 border-purple-600 max-h-[800px] overflow-y-scroll">
-        <h1 className="text-center text-2xl font-extrabold">Filter</h1>
-        <h1 className="font-medium text-xl hover:underline mt-5">Categories</h1>
-        <ul className="mt-3 flex flex-col gap-1 ml-3">
-          <li className="flex justify-between ">
+      <div className="w-1/5 min-w-[300px] fixed h-fit p-8 pt-3 ml-10 bg-[#4f156e]  border-4 border-purple-600 max-h-[800px] overflow-y-scroll">
+        <h1 className="text-center text-2xl font-extrabold text-white">Filter</h1>
+        <h1 className="font-medium text-xl hover:underline cursor-pointer mt-5 text-white">Categories</h1>
+        <ul className="mt-3 flex flex-col gap-1 ml-3 text-white">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="all">All</label>
             <input
               type="radio"
@@ -35,7 +35,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="electronics">Electronics</label>
             <input
               type="radio"
@@ -46,7 +46,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="home-appliances">Home Appliances</label>
             <input
               type="radio"
@@ -57,7 +57,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="fitness">Fitness</label>
             <input
               type="radio"
@@ -68,7 +68,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="wearables">Wearables</label>
             <input
               type="radio"
@@ -79,7 +79,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="lighting">Lighting</label>
             <input
               type="radio"
@@ -90,7 +90,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="furniture">Furniture</label>
             <input
               type="radio"
@@ -101,7 +101,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="transportation">Transportation</label>
             <input
               type="radio"
@@ -112,7 +112,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="home-security">Home Security</label>
             <input
               type="radio"
@@ -123,7 +123,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="kitchen-appliances">Kitchen Appliances</label>
             <input
               type="radio"
@@ -134,7 +134,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="personal-care">Personal Care</label>
             <input
               type="radio"
@@ -145,7 +145,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="outdoor">Outdoor</label>
             <input
               type="radio"
@@ -156,7 +156,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="cleaning">Cleaning</label>
             <input
               type="radio"
@@ -167,7 +167,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="home-automation">Home Automation</label>
             <input
               type="radio"
@@ -178,7 +178,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="home-decor">Home decor</label>
             <input
               type="radio"
@@ -189,7 +189,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between  ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="health">Health</label>
             <input
               type="radio"
@@ -200,7 +200,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="audio">Audio</label>
             <input
               type="radio"
@@ -211,7 +211,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handleChange}
             />
           </li>
-          <li className="flex justify-between ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="accessories">Accessories</label>
             <input
               type="radio"
@@ -225,9 +225,9 @@ const ProductFilter = ({checkHandler}) => {
         </ul>
 
         {/* sort by price */}
-        <h1 className="font-medium text-xl mt-5">Price</h1>
-        <ul className="mt-3 flex flex-col gap-1 ml-3">
-          <li className="flex justify-between ">
+        <h1 className="font-medium text-xl mt-5 hover:underline cursor-pointer text-white">Price</h1>
+        <ul className="mt-3 flex flex-col gap-1 ml-3 text-white">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="low-to-high">Low to High</label>
             <input
               type="radio"
@@ -238,7 +238,7 @@ const ProductFilter = ({checkHandler}) => {
               onChange={handlePriceChange}
             />
           </li>
-          <li className="flex justify-between ">
+          <li className="flex justify-between hover:scale-105 transition-transform duration-300">
             <label htmlFor="high-to-low">High to Low</label>
             <input
               type="radio"

@@ -12,6 +12,7 @@ export const addItemToCart = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  
   const cartRepo = AppDataSource.getRepository(Cart);
   const productRepo = AppDataSource.getRepository(Product);
 

@@ -5,6 +5,8 @@ import router from "./routes/user";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from 'express-session';
+import bodyParser from "body-parser";
+import multer from "multer";
 
 const app = express();
 const port = 4000;
@@ -16,6 +18,8 @@ const corsOptions = {
 };
 
 //middlewares
+app.use(bodyParser.json({ limit: '20mb' }));
+
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
@@ -27,6 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(router);
+
+
 
 //connect to the db and server
 AppDataSource.initialize()

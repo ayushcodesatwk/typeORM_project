@@ -14,7 +14,6 @@ DATABASE DRIVER (postgres, sql etc)
 - by default all operations are asynchronous in typeORM
 -----------------------------------------------
 
-
  relations in typeORM -
 
  to make one to many relations
@@ -30,3 +29,22 @@ DATABASE DRIVER (postgres, sql etc)
 //in the cart entity
  @ManyToOne(() => User, (user) => user.cart)
  user: User
+
+---------------
+
+BUGS OF THE APP-
+
+after filtering out the data we get the data but, 
+when we scroll down we get all the remaining products.
+
+after adding the product to the cart from the store page 
+we doesn't get the increased number of cart items.
+
+------------------------------
+
+steps that I can take to fix the image url issue----
+
+update & upload all the images to the database in assets to the product database 
+as per the title...
+
+

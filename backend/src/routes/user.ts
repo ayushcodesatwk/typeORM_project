@@ -1,8 +1,9 @@
 import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
-import { Product } from "../entities/product";
+
 import {
+  addProductToTable,
   filterProductsByCategoryAndPrice,
   searchItemInProductTable,
 } from "../controllers/store";
@@ -22,7 +23,11 @@ import {
   plusOneItem,
 } from "../controllers/cart";
 
+import { uploadAnImageToCloudinary } from "../controllers/store";
+import multer from "multer";
+
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' });
 
 //crud operations using typeorm
 router.route("/").get(async (req, res) => {
@@ -115,5 +120,11 @@ router.route("/search").get(searchItemInProductTable);
 
 //filterProducts
 router.route("/filter").get(filterProductsByCategoryAndPrice);
+
+//add product to table
+router.route("/addProduct").post(addProductToTable);
+
+//upload image
+router.route("/uploadImage").post(uploadAnImageToCloudinary);
 
 export default router;

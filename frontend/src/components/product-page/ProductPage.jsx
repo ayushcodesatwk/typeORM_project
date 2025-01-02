@@ -58,7 +58,7 @@ const ProductPage = ({ clickFunc }) => {
     <>
       <div className="min-h-screen bg-gray-900 -mt-32">
         <div className="flex m-32 pt-32 text-white gap-20 screen-max-12:flex-col screen-max-12:m-12">
-          <div className="h-full w-full max-w-[500px] mx-auto bg-white rounded-lg shadow-lg relative">
+          <div className="h-full w-full max-w-[500px] mx-auto bg-white shadow-lg relative">
             <div className="p-5 h-auto w-full relative">
               <ReactImageMagnify
                 {...{
@@ -112,7 +112,7 @@ const ProductPage = ({ clickFunc }) => {
               </div>
               <button
                 onClick={() => addItemHandler(product)}
-                className="font-bold text-xl mt-4 p-3 w-full hover:bg-purple-700 text-white bg-purple-500"
+                className="font-bold text-xl mt-4 p-3 w-full hover:bg-purple-700 text-white bg-purple-900 transition-colors duration-300 delay-150"
               >
                 Add to Cart
               </button>

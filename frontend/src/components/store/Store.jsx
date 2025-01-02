@@ -150,7 +150,7 @@ const Store = ({ clickFunc }) => {
           // selectedCat={checkedItems}
           checkHandler={(category, priceCat) => checkCategoryHandler(category, priceCat)}
         />
-        <div className="flex flex-col ml-96 gap-5 w-full items-center">
+        <div className="flex flex-col ml-96 gap-5 w-full items-center ">
             <div
               className="flex flex-wrap w-full gap-10 justify-center mb-14"
               onScroll={handleScroll}
@@ -158,9 +158,9 @@ const Store = ({ clickFunc }) => {
               {storeArray.map((item, ind) => (
                 <div
                   key={ind}
-                  className="border bg-[#F6F4F1] h-fit w-80 cursor-pointer border-[#D1D5DB] hover:scale-110 transition-transform duration-300 shadow-md"
+                  className="border bg-[#4f156e] h-fit w-80 cursor-pointer border-[#D1D5DB] hover:scale-110 transition-transform duration-300 shadow-md"
                 >
-                  <div className="h-44 rounded-xl overflow-hidden m-3">
+                  <div className="h-44 overflow-hidden m-3">
                     <Link to={`/store/${item.id}`}>
                       <img
                         src={item.imageURL}
@@ -170,16 +170,16 @@ const Store = ({ clickFunc }) => {
                     </Link>
                   </div>
                   <Link to={`/store/${item.id}`}>
-                    <p className="m-3 text-gray-700">{item.title}</p>
+                    <p className="m-3 text-white">{item.title}</p>
                   </Link>
                   <Link to={`/store/${item.id}`}>
-                    <p className="font-bold text-xl mt-4 m-3 text-[#333333]">
+                    <p className="font-bold text-xl mt-4 m-3 text-[#fff]">
                       $ {item.price}
                     </p>
                   </Link>
                   <button
                     onClick={() => addItemHandler(item)}
-                    className="font-bold text-xl mt-4 m-3 p-3 bg-purple-900 text-white hover:bg-purple-700"
+                    className="font-bold text-xl mt-4 m-3 p-3 bg-[ #4169e1] border border-white text-white hover:bg-purple-700 transition-colors duration-300 delay-150"
                   >
                     Add to Cart
                   </button>

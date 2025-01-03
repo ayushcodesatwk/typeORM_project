@@ -127,8 +127,8 @@ const Auth = () => {
 
   return (
     <>
-      <div className="w-full pt-20 bg-gray-900 h-auto min-h-screen">
-        <div className="ml-auto mr-auto w-[500px] p-5 border-2 border-stone-200 mt-20 max-h-[700px] overflow-y-scroll scrollbar-hide">
+      <div className="w-full pt-20 screen-max-6:h-[1200px] bg-gray-900 h-auto screen-max-6:w-fit min-h-screen screen-max-12:pt-48">
+        <div className="ml-auto  mr-auto w-[500px] p-5 border-2 border-stone-200 mt-20 max-h-[700px] overflow-y-scroll scrollbar-hide ">
           <h2 className="text-3xl font-bold text-center text-stone-100">
             {loginMode ? "Login" : "Sign up"}
           </h2>

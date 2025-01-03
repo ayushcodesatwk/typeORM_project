@@ -109,7 +109,7 @@ const Cart = () => {
 
   return (
     <>
-      <div className=" pt-28 min-h-screen bg-gray-900">
+      <div className="pt-28 min-h-screen bg-gray-900 screen-max-6:w-fit">
         <h1 className="text-center font-bold text-5xl text-yellow-400">
           Your Cart
         </h1>
@@ -123,7 +123,7 @@ const Cart = () => {
               <div className="flex">
                 <div className="flex w-full">
                   <img
-                    className="w-40 h-40 rounded-xl shadow-lg"
+                    className="w-40 h-40 shadow-lg"
                     src={item.product.imageURL}
                     alt={item.product.title}
                   />
@@ -134,7 +134,7 @@ const Cart = () => {
                         $ {item.product.price} × {item.quantity} = ${" "}
                         {(item.product.price * item.quantity).toFixed(2)}
                       </p>
-                      <p className="mt-3 font-bold">
+                      <p className="mt-3 font-bold w-24">
                         <button onClick={() => plusOneClick(item.cartId)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300">
                           +
                         </button>

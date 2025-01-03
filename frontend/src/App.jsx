@@ -43,7 +43,6 @@ function App() {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "colored",
       transition: Bounce,
     });
   };
@@ -73,12 +72,12 @@ function App() {
         autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
+        toastStyle={{ }}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored"
         transition={Bounce}
       />
     </>

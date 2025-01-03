@@ -18,7 +18,7 @@ const ProductPage = ({ clickFunc }) => {
   const { title, imageURL, description, price, stock, category, createdAt } =
     product;
 
-  //add item to cart if it doesn't exists 
+  //add item to cart if it doesn't exists
   //increases quantity if it does exist
   const addItemHandler = async (item) => {
     try {
@@ -56,65 +56,49 @@ const ProductPage = ({ clickFunc }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-900 -mt-32">
-        <div className="flex m-32 pt-32 text-white gap-20 screen-max-12:flex-col screen-max-12:m-12">
-          <div className="h-full w-full max-w-[500px] mx-auto bg-white shadow-lg relative">
-            <div className="p-5 h-auto w-full relative">
-              <ReactImageMagnify
-                {...{
-                  smallImage: {
-                    alt: title,
-                    isFluidWidth: true,
-                    src: imageURL,
-                    width: 100,
-                    height: 800,
-                  },
-                  largeImage: {
-                    src: imageURL,
-                    width: 1800,
-                    height: 2000,
-                  },
-                }}
-              />
-            </div>
-          </div>
+      <div className="flex justify-center screen-max-6:w-fit screen-max-6:h-fit screen-max-12:flex-col screen-max-12:items-center bg-gray-900 min-h-screen">
+        {/* product image */}
+        <div className="pt-40 screen-max-9:pt-52 screen-max-12:w-[500px]">
+          <img
+            src={imageURL}
+            alt="product-image"
+            className="w-[600px] h-[700px] p-5 bg-white"
+          />
+        </div>
 
-          <div className="w-1/2 text-white screen-max-12:w-full">
-            <h1 className="text-4xl mt-3 font-medium w-full">{title}</h1>
-            <h1 className="font-bold text-4xl mt-4">$ {price}</h1>
-            <div className="border-2 border-yellow-500 p-5 mt-10 shadow-lg">
-              <p className="text-yellow-500 text-xl underline mr-2">
-                Description:
+        {/* product details */}
+        <div className=" h-fit w-[500px] text-white mt-40 screen-max-12:mt-20 ml-16 screen-max-12:ml-5 screen-max-12:w-[600px]">
+          <div>
+            <h1 className="text-3xl ">{title}</h1>
+
+            <h1 className="mt-10 font-bold text-3xl">$ {price}</h1>
+
+            <div className="border-2 border-white mt-12 p-5 ">
+              <p className="text-yellow-500 font-bold text-xl hover:underline ">
+                Description
               </p>
-              <p className="mt-5 ml-2 text-base">{description}</p>
+              <p className="pl-2 mt-2 text-lg">{description}</p>
 
-              <p className="text-yellow-500 text-xl underline mt-5 ">
-                Category:
+              <p className="text-yellow-500 font-bold text-xl hover:underline mt-5">
+                Stock
               </p>
-              <p className="pr-3 mt-3 ml-2 text-lg capitalize inline-block">
-                {category}
+              <p className="pl-2 mt-2 text-lg">{stock} items in stock</p>
+
+              <p className="text-yellow-500 font-bold inline-block text-xl hover:underline mt-5">
+                Category
               </p>
+              <p className="pl-2 mt-2 text-lg">{category}</p>
 
-              <div>
-                <p className="text-yellow-500 text-xl underline mt-5 mr-2">
-                  Added on:
-                </p>
-                <p className="pr-3 mt-5 ml-2 text-lg capitalize">
-                  {createdAt.split("T")[0]}
-                </p>
-              </div>
+              <p className="text-yellow-500 font-bold text-xl hover:underline mt-5">
+                Added on
+              </p>
+              <p className="pl-2 mt-2 text-lg">{createdAt.split("T")[0]}</p>
 
-              <div className="flex ">
-                <p className="text-yellow-500 text-xl underline mt-5 mr-2">
-                  Items left:
-                </p>
-                <p className="pr-3 mt-5 ml-2 text-lg ">{stock}</p>
-              </div>
               <button
                 onClick={() => addItemHandler(product)}
-                className="font-bold text-xl mt-4 p-3 w-full hover:bg-purple-700 text-white bg-purple-900 transition-colors duration-300 delay-150"
+                className="mt-4 bg-purple-800 w-full text-xl p-5 font-bold hover:bg-purple-500"
               >
-                Add to Cart
+                Add To Cart
               </button>
             </div>
           </div>

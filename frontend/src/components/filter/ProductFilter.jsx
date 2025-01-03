@@ -20,7 +20,7 @@ const ProductFilter = ({checkHandler}) => {
 
   return (
     <>
-      <div className="w-1/5 min-w-[300px] fixed h-fit p-8 pt-3 ml-10 bg-[#4f156e]  border-4 border-purple-600 max-h-[800px] overflow-y-scroll">
+      <div className="w-auto screen-max-9:mt-20 fixed h-fit p-8 pt-3 ml-10 bg-[#4f156e] border-4 border-purple-600 max-h-[800px] overflow-y-scroll">
         <h1 className="text-center text-2xl font-extrabold text-white">Filter</h1>
         <h1 className="font-medium text-xl hover:underline cursor-pointer mt-5 text-white">Categories</h1>
         <ul className="mt-3 flex flex-col gap-1 ml-3 text-white">

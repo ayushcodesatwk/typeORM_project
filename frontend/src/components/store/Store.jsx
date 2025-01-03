@@ -145,14 +145,14 @@ const Store = ({ clickFunc }) => {
 
   return (
     <>
-      <div className="flex pt-24 bg-gray-900 min-h-screen">
+      <div className="flex pt-24 bg-gray-900 screen-max-6:w-fit min-h-screen">
         <ProductFilter
           // selectedCat={checkedItems}
           checkHandler={(category, priceCat) => checkCategoryHandler(category, priceCat)}
         />
-        <div className="flex flex-col ml-96 gap-5 w-full items-center ">
+        <div className="flex flex-col ml-80 gap-5 items-center screen-max-9:mt-20">
             <div
-              className="flex flex-wrap w-full gap-10 justify-center mb-14"
+              className="flex flex-wrap gap-10 justify-center mb-14"
               onScroll={handleScroll}
             >
               {storeArray.map((item, ind) => (

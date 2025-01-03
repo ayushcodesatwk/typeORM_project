@@ -36,7 +36,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="w-full flex fixed bg-gray-900 p-3 justify-evenly text-4xl">
+      <div className="w-full flex fixed bg-gray-900 p-3 justify-evenly text-4xl screen-max-9:flex-col">
         <h1 className="font-medium text-yellow-500 cursor-pointer">
           E-commerce
         </h1>

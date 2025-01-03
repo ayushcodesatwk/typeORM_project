@@ -179,7 +179,7 @@ const Store = ({ clickFunc }) => {
                   </Link>
                   <button
                     onClick={() => addItemHandler(item)}
-                    className="font-bold text-xl mt-4 m-3 p-3 bg-[ #4169e1] border border-white text-white hover:bg-purple-700 transition-colors duration-300 delay-150"
+                    className="font-bold text-xl mt-4 m-3 p-3 bg-[ #4169e1] border border-white text-white hover:bg-purple-500 transition-colors duration-300 delay-150"
                   >
                     Add to Cart
                   </button>

@@ -1,17 +1,19 @@
 import "./App.css";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
-import Store from "./components/store/Store";
-import Cart from "./components/cart/Cart";
-import Auth from "./components/authentication/Auth";
-import About from "./components/about/About";
-import { useEffect } from "react";
 import axios from "axios";
+import Navbar from "./components/navbar/Navbar";
+const Store = lazy(() => import("./components/store/Store"))
+const Cart = lazy(() => import("./components/cart/Cart"))
+const Auth = lazy(() => import("./components/authentication/Auth"))
+const About = lazy(() => import("./components/about/About"))
+const ProductPage = lazy(() => import("./components/product-page/ProductPage"))
+const UploadProduct = lazy(() => import("./components/product-uploader/UploadProduct")) 
+
 import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
-import ProductPage from "./components/product-page/ProductPage";
 import { Bounce, ToastContainer, toast } from "react-toastify";
-import UploadProduct from "./components/product-uploader/UploadProduct";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -23,11 +25,11 @@ function App() {
     });
 
     if (waitForMe.status === 200) {
-      console.log("true hai--", waitForMe);
+      console.log("user is already logged in--", waitForMe);
       dispatch(setIsLoginUsingToken(waitForMe.data));
     }
 
-    console.log("wait for me check- ", waitForMe);
+    console.log("user is not logged in--", waitForMe);
     return;
   };
 
@@ -54,6 +56,7 @@ function App() {
     <>
       <BrowserRouter>
         <Navbar />
+        <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/*" element={<Store clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/store/:productId" element={<ProductPage clickFunc={(msg) => notify(msg)}/>} />
@@ -62,6 +65,7 @@ function App() {
           <Route path="/login" element={<Auth />} />
           <Route path="/about" element={<About />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
       
       <ToastContainer

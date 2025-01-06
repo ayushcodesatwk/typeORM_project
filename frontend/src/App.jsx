@@ -4,11 +4,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./components/navbar/Navbar";
 const Store = lazy(() => import("./components/store/Store"))
-const Cart = lazy(() => import("./components/cart/Cart"))
 const Auth = lazy(() => import("./components/authentication/Auth"))
 const About = lazy(() => import("./components/about/About"))
 const ProductPage = lazy(() => import("./components/product-page/ProductPage"))
 const UploadProduct = lazy(() => import("./components/product-uploader/UploadProduct")) 
+const Orders = lazy(() => import("./components/orders/Orders"))
 
 import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
@@ -59,7 +59,8 @@ function App() {
         <Routes>
           <Route path="/*" element={<Store clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/store/:productId" element={<ProductPage clickFunc={(msg) => notify(msg)}/>} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<Orders />} />
+          <Route path="/order/success" element={<Orders />} />
           <Route path="/uploadProduct" element={<UploadProduct />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/about" element={<About />} />

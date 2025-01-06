@@ -3,7 +3,7 @@ import requireAuth from "../middlewares/user";
 import { JwtPayload } from "jsonwebtoken";
 import jwtoken from "jsonwebtoken";
 import { Product } from "../entities/product";
-import { Request, Response, NextFunction } from "express";
+  import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source";
 
 // adding item to cart

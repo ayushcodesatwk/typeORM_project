@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,9 +7,10 @@ import {
 } from "../../store/slices/cartSlice";
 import { totalAmount } from "../../store/slices/cartSlice";
 import { plusOne, minusOne } from "../../store/slices/cartSlice";
+import OrderAccepted from "./OrderAccepted";
 
 
-const Cart = () => {
+const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
   const cartArray = useSelector((state) => state.cart.cartArray);
   const amount = useSelector((state) => state.cart.amount);
 
@@ -19,15 +20,16 @@ const Cart = () => {
   const deleteItemHandler = async (cartId) => {
     try {
       const result = await axios.delete("http://localhost:4000/cart", {
-        data: { cartId: cartId }, 
+        data: { cartId: cartId },
         withCredentials: true,
       });
 
-      console.log('deleted item--', result);
-  
+      console.log("deleted item--", result);
+
       if (result.status === 200) {
         dispatch(deleteItemFromCart(cartId));
-        console.log('Item deleted from cart successfully...'); 
+        dispatch(totalAmount());
+        console.log("Item deleted from cart successfully...");
       }
     } catch (error) {
       console.error("Error deleting item:", error.message);
@@ -44,37 +46,33 @@ const Cart = () => {
       console.log("cart Data: ", result.data);
 
       dispatch(addAllItemsToCart(result.data));
-      
-      dispatch(totalAmount());
 
+      dispatch(totalAmount());
     } catch (error) {
       console.error("Error fetching cart products: ", error.message);
     }
   };
   useEffect(() => {
     fetchCartItem();
-  },[]);
+  }, []);
 
-
-  //increase quantity by one 
+  //increase quantity by one
   const plusOneClick = async (cartId) => {
+    console.log("cartId from cartJSX PLUSCLICK-", cartId);
 
-    console.log('cartId from cartJSX PLUSCLICK-', cartId);
-    
-    
-    try{
-        const result = await axios.put("http://localhost:4000/plus-one", 
-         { cartId: cartId }, 
-         { withCredentials: true}
-        );
+    try {
+      const result = await axios.put(
+        "http://localhost:4000/plus-one",
+        { cartId: cartId },
+        { withCredentials: true }
+      );
 
-        console.log("result from plusOne--", result);
-    
-        if (result.status === 200) {
-          dispatch(plusOne(cartId));
-          dispatch(totalAmount());
-        }
+      console.log("result from plusOne--", result);
 
+      if (result.status === 200) {
+        dispatch(plusOne(cartId));
+        dispatch(totalAmount());
+      }
     } catch (error) {
       console.error("Error deleting item:", error.message);
     }
@@ -84,37 +82,34 @@ const Cart = () => {
 
   //reduce quantity by one
   const minusOneClick = async (cartId) => {
+    console.log("cartId from cartJSX MINUSCLICK-", cartId);
 
-    console.log('cartId from cartJSX MINUSCLICK-', cartId);
+    try {
+      const result = await axios.put(
+        "http://localhost:4000/minus-one",
+        { cartId: cartId },
+        { withCredentials: true }
+      );
 
+      console.log("result status minusOne--", result);
 
-    try{
-      const result = await axios.put("http://localhost:4000/minus-one", 
-        { cartId: cartId }, 
-        { withCredentials: true}
-       );
-  
-      console.log('result status minusOne--', result);
-      
-      if(result.status === 200){
-          dispatch(minusOne(cartId));
-          dispatch(totalAmount());
+      if (result.status === 200) {
+        dispatch(minusOne(cartId));
+        dispatch(totalAmount());
       }
-
     } catch (error) {
       console.error("Error deleting item:", error.message);
     }
-  }
-  
+  };
 
   return (
     <>
-      <div className="pt-28 min-h-screen bg-gray-900 screen-max-6:w-fit">
+    {responseId ? <OrderAccepted/> : <div className="pt-28 screen-max-9:pt-44 min-h-screen bg-gray-900 screen-max-6:w-fit">
         <h1 className="text-center font-bold text-5xl text-yellow-400">
           Your Cart
         </h1>
 
-        {!cartArray.length == 0 ? ( 
+        {!cartArray.length == 0 ? (
           cartArray.map((item, i) => (
             <div
               key={i}
@@ -123,7 +118,7 @@ const Cart = () => {
               <div className="flex">
                 <div className="flex w-full">
                   <img
-                    className="w-40 h-40 shadow-lg"
+                    className="w-40 h-40 first-line:shadow-lg"
                     src={item.product.imageURL}
                     alt={item.product.title}
                   />
@@ -135,10 +130,16 @@ const Cart = () => {
                         {(item.product.price * item.quantity).toFixed(2)}
                       </p>
                       <p className="mt-3 font-bold w-24">
-                        <button onClick={() => plusOneClick(item.cartId)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300">
+                        <button
+                          onClick={() => plusOneClick(item.cartId)}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-l hover:scale-110 transition-transform duration-300"
+                        >
                           +
                         </button>
-                        <button onClick={() => minusOneClick(item.cartId)} className="bg-white hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-r hover:scale-105 transition-transform duration-300">
+                        <button
+                          onClick={() => minusOneClick(item.cartId)}
+                          className="bg-white hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-r hover:scale-105 transition-transform duration-300"
+                        >
                           -
                         </button>
                       </p>
@@ -166,6 +167,7 @@ const Cart = () => {
               <button
                 type="button"
                 className="p-3 w-52 mt-4 bg-green-300 font-medium hover:bg-green-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
+                onClick={() => createOrder(amount)}
               >
                 Buy Now
               </button>
@@ -175,7 +177,8 @@ const Cart = () => {
             </div>
           </>
         )}
-      </div>
+      </div>}
+      
     </>
   );
 };

@@ -24,10 +24,8 @@ import {
 } from "../controllers/cart";
 
 import { uploadAnImageToCloudinary } from "../controllers/store";
-import multer from "multer";
-
+import { getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
 
 //crud operations using typeorm
 router.route("/").get(async (req, res) => {
@@ -126,5 +124,9 @@ router.route("/addProduct").post(addProductToTable);
 
 //upload image
 router.route("/uploadImage").post(uploadAnImageToCloudinary);
+
+//handle orders & payments
+router.route("/orders").post(HandleOrdersRzrPay);
+router.route("/payment/:paymentId").get(getPaymentDetails)
 
 export default router;

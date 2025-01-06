@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from "typeorm";
 import { Cart } from "./cart";
+import { OrderItem } from "./orderItem";
 
 
 @Entity()
@@ -31,4 +32,8 @@ export class Product {
   //multiple cart Item can belong to one product.
   @OneToMany(() => Cart, cart => cart.product)
   carts: Cart[];
+
+  //one product can be ordered more than one time.
+  @OneToMany(() => OrderItem, order_item => order_item.product)
+  orderItem: OrderItem[];
 }

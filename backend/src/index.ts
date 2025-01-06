@@ -6,7 +6,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from 'express-session';
 import bodyParser from "body-parser";
-import multer from "multer";
+import Razorpay from "razorpay";
+
 
 const app = express();
 const port = 4000;
@@ -19,7 +20,6 @@ const corsOptions = {
 
 //middlewares
 app.use(bodyParser.json({ limit: '20mb' }));
-
 app.use(session({
   secret: 'your-secret-key',
   resave: false,

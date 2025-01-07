@@ -1,5 +1,6 @@
 import { Column, Decimal128, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./product";
+import { Orders } from "./order";
 
 
 @Entity()
@@ -17,4 +18,8 @@ export class OrderItem{
     @ManyToOne(() => Product, product => product.orderItem)
     @JoinColumn({name: "productId"})
     product: Product
+
+    @ManyToOne(() => Orders, orders => orders.orderItem)
+    @JoinColumn({name: "orderId"})
+    order: Orders
 }

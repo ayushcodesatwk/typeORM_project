@@ -1,12 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Users } from "./user";
 import { Orders } from "./order";
 
 @Entity()
 export class Payments {
 
-    @PrimaryGeneratedColumn()
-    paymentId: number;
+    @PrimaryColumn({ type: "varchar" }) 
+    paymentId: string;
 
     @Column({ type: "date" })
     paymentDate: Date;

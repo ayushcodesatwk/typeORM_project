@@ -16,6 +16,8 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
 
   const dispatch = useDispatch();
 
+  // console.log("responseState from orders--", responseState);
+
   //deleting item from cart
   const deleteItemHandler = async (cartId) => {
     try {
@@ -164,6 +166,9 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
         {!cartArray.length == 0 && (
           <>
             <div className="flex flex-col pb-20 m-auto w-1/2 items-end">
+              <h1 className=" text-xl mt-5 screen-max-7:w-44 font-bold text-yellow-400">
+                Total amount: $ {amount}
+              </h1>
               <button
                 type="button"
                 className="p-3 w-52 mt-4 bg-green-300 font-medium hover:bg-green-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
@@ -171,9 +176,6 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
               >
                 Buy Now
               </button>
-              <h1 className=" text-xl mt-5 screen-max-7:w-44 font-bold text-yellow-400">
-                Total amount: $ {amount}
-              </h1>
             </div>
           </>
         )}

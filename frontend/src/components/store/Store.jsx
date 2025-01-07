@@ -150,7 +150,7 @@ const Store = ({ clickFunc }) => {
           // selectedCat={checkedItems}
           checkHandler={(category, priceCat) => checkCategoryHandler(category, priceCat)}
         />
-        <div className="flex flex-col ml-80 gap-5 items-center screen-max-9:mt-20">
+        <div className="flex w-full flex-col ml-80 gap-5 items-center screen-max-9:mt-20">
             <div
               className="flex flex-wrap gap-10 justify-center mb-14"
               onScroll={handleScroll}

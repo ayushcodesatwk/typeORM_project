@@ -47,4 +47,9 @@ steps that I can take to fix the image url issue----
 update & upload all the images to the database in assets to the product database 
 as per the title...
 
+--------------------------------
 
+once payment is done-- 
+    call an api (createOrder) which will create new order with all the cart items of user,
+    (once created clear all the cart items from the cart for the specific user in BE then in FE).
+    after that create a new payment using (paymentSuccessful API) with all payment details.

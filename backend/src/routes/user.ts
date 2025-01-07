@@ -17,6 +17,7 @@ import {
 
 import {
   addItemToCart,
+  clearCartByUserId,
   deleteItemFromCart,
   fetchUserCart,
   minusOneItem,
@@ -24,7 +25,7 @@ import {
 } from "../controllers/cart";
 
 import { uploadAnImageToCloudinary } from "../controllers/store";
-import { getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
+import { createOrder, getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
 const router = express.Router();
 
 //crud operations using typeorm
@@ -128,5 +129,11 @@ router.route("/uploadImage").post(uploadAnImageToCloudinary);
 //handle orders & payments
 router.route("/orders").post(HandleOrdersRzrPay);
 router.route("/payment/:paymentId").get(getPaymentDetails)
+
+//create order on successful payment
+router.route("/createOrder").post(createOrder);
+
+//clear cart by userId
+router.route("/clearCart").delete(clearCartByUserId);
 
 export default router;

@@ -3,7 +3,7 @@ import requireAuth from "../middlewares/user";
 import { JwtPayload } from "jsonwebtoken";
 import jwtoken from "jsonwebtoken";
 import { Product } from "../entities/product";
-  import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source";
 
 // adding item to cart
@@ -12,7 +12,6 @@ export const addItemToCart = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  
   const cartRepo = AppDataSource.getRepository(Cart);
   const productRepo = AppDataSource.getRepository(Product);
 
@@ -103,8 +102,6 @@ export const fetchUserCart = async (
           relations: ["product", "user"],
         });
 
-        console.log("loggedin user's cart array- ", cartArray);
-
         res.status(201).json(cartArray);
 
         return;
@@ -180,7 +177,6 @@ export const minusOneItem = async (
   console.log("cartItem from minusOne--", existingProduct);
 
   if (existingProduct) {
- 
     //if quantity is one delete it
     if (existingProduct.quantity == 1) {
       const deleteItem = await AppDataSource.createQueryBuilder()
@@ -188,33 +184,31 @@ export const minusOneItem = async (
         .from(Cart)
         .where("cartId = :cartId", { cartId: existingProduct.cartId })
         .execute();
- 
+
       if (deleteItem.affected === 0) {
         res.status(404).json({ message: "Product not found in cart." });
         return;
       }
 
       console.log("DeletedITEM--", deleteItem);
-  
-      res.status(200).json({msg: "deleted from cart"});
-  
+
+      res.status(200).json({ msg: "deleted from cart" });
+
       return;
-    }
-    else{
+    } else {
       //otherwise just reduce quantity by one
       existingProduct.quantity -= 1;
-  
+
       await cartRepo.save(existingProduct);
-  
+
       const cartArray = await cartRepo.find({
         where: { user: { id: userId } },
         relations: ["user", "product"],
       });
-  
-      res.status(200).json(cartArray);
-  
-      return;
 
+      res.status(200).json(cartArray);
+
+      return;
     }
   }
 };
@@ -225,47 +219,89 @@ export const plusOneItem = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-
   const { cartId } = req.body;
 
   //getting the token to get logged in userId
   const token = req.cookies.jwt;
 
-  console.log('tokn from cart plusone---', token, cartId);
-  
+  console.log("tokn from cart plusone---", token, cartId);
 
-  if(token){
-
+  if (token) {
     const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
     console.log("log the web token data", data);
     const userId = data.id;
-  
+
     const cartRepo = AppDataSource.getRepository(Cart);
-  
+
     console.log("CARTiD- from plusOne--", cartId);
-  
+
     const existingProduct = await cartRepo.findOne({
       where: { user: { id: userId }, cartId: cartId },
       relations: ["user", "product"],
     });
-  
+
     console.log("cartItem from plusOne--", existingProduct);
-  
+
     if (existingProduct) {
-  
       existingProduct.quantity += 1;
-  
+
       await cartRepo.save(existingProduct);
-  
+
       const cartArray = await cartRepo.find({
         where: { user: { id: userId } },
         relations: ["user", "product"],
       });
-  
+
       res.status(200).json(cartArray);
-  
+
       return;
     }
   }
+};
 
+//clear cart items by userId
+export const clearCartByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    res.status(401).json({ msg: "No token provided" });
+    return;
+  }
+
+  let userId: any;
+
+  try {
+    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+    userId = data.id;
+    console.log("USER ID from clearCART--",userId);
+    
+  } catch (err) {
+    res.status(401).json({ msg: "Invalid token" });
+    return;
+  }
+
+  try {
+
+    const deleteItem = await AppDataSource.createQueryBuilder()
+      .delete()
+      .from(Cart)
+      .where("userId = :userId", { userId: userId })
+      .execute();
+  
+    if (deleteItem.affected === 0) {
+      res.status(404).json({ message: "Product not found in cart" });
+      return;
+    }
+  
+    console.log("DeletedITEM", deleteItem);
+  
+    res.status(200).json({ message: "Product Deleted" });
+    return;
+    
+  } catch (error) {
+    res.status(500).json({ msg: "Failed to delete cart" });
+  }
 };

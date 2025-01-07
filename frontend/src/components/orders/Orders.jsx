@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import Cart from "../cart/Cart";
 import axios from "axios";
+import { clearCartOnLogout } from "../../store/slices/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Orders = () => {
+  const cartItems = useSelector((state) => state.cart.cartArray);
+  const totalAmount = useSelector((state) => state.cart.amount);
+  const dispatch = useDispatch();
+
   const [responseId, setResponseId] = useState("");
   const [responseState, setResponseState] = useState([]);
 
@@ -30,7 +36,7 @@ const Orders = () => {
     );
 
     if (!res) {
-      alert("error at razorpay screen loading..");
+      alert("Error at Razorpay screen loading.");
       return;
     }
 
@@ -39,13 +45,57 @@ const Orders = () => {
       amount: amount,
       currency: "INR",
       name: "ecommerce website",
-      description: "payment to ecommerce website",
+      description: "Payment to ecommerce website",
       image: "",
-      handler: function (response) {
+      handler: async function (response) {
         setResponseId(response.razorpay_payment_id);
+
+        console.log("razorpay_payment_id--", response.razorpay_payment_id);
+
+        //create the order after successful payment
+        try {
+          const result = await axios.post(
+            "http://localhost:4000/createOrder",
+            {
+              totalPrice: totalAmount,
+              orderItem: cartItems,
+              paymentId: response.razorpay_payment_id, 
+            },
+            { withCredentials: true }
+          );
+
+          console.log("handler function result--", result);
+
+          if (result.status === 200 || result.status === 201) {
+            console.log("Order created successfully", result.data);
+            
+            
+            // clear the cart after successful order creation
+            try {
+              
+              const result = await axios.delete("http://localhost:4000/clearCart", {
+                withCredentials: true,
+              })
+
+              console.log("Cart cleared successfully", result.data);
+
+              if(result.status === 200){
+                dispatch(clearCartOnLogout());
+              }
+
+            } catch (error) {
+              console.log("Error clearing cart data--", error);
+            }
+
+          } else {
+            console.log("Error creating order", result.data);
+          }
+        } catch (error) {
+          console.log("Error creating order", error);
+        }
       },
       prefill: {
-        name: "ecommerce website",
+        name: "E-commerce website",
         email: "ayushpal6939@gmail.com",
       },
       theme: {
@@ -68,7 +118,7 @@ const Orders = () => {
         console.log(response.data);
         setResponseState(response.data);
       })
-      .catch((err) => console.log("Error getting payment details--", error));
+      .catch((err) => console.log("Error getting payment details--", err));
   };
 
   const createRazorpayOrder = (amount) => {
@@ -90,7 +140,10 @@ const Orders = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        console.log(
+          "createRazorpayOrder response.data- ",
+          JSON.stringify(response.data)
+        );
         handleRazorpayScreen(response.data.amount);
       })
       .catch((error) => {
@@ -103,9 +156,24 @@ const Orders = () => {
       <Cart
         createOrder={(amount) => createRazorpayOrder(amount)}
         responseId={responseId}
-        fetchPayment={paymentFetch}
-        responseState={responseState}
       />
+
+      <form onSubmit={paymentFetch}>
+        <input type="text" name="paymentId" />
+        <button type="submit" className="p-2">
+          Submit
+        </button>
+      </form>
+
+      <div>
+        {responseState.map((response) => (
+          <ul className="border border-white p-2" key={response.id}>
+            <li>{response.id}</li>
+            <li>{response.amount}</li>
+            <li>{response.status}</li>
+          </ul>
+        ))}
+      </div>
     </>
   );
 };

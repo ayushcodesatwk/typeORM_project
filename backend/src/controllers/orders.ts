@@ -21,15 +21,19 @@ export const HandleOrdersRzrPay = async (
 
   //creating an order in reference to options
   const options = {
-    amount: req.body.amount,
+    amount: Math.round(req.body.amount),
     currency: req.body.currency,
     receipt: "Receipt",
     payment_capture: 1,
   };
 
+  console.log("options--",options);
+  
+
   try {
     //creating an order in reference to options
     const response = await razorpay.orders.create(options);
+    console.log("RESPONSE--",response);
 
     res.json({
       order_id: response.id,
@@ -37,6 +41,7 @@ export const HandleOrdersRzrPay = async (
       amount: response.amount,
     });
   } catch (error) {
+    console.log("error-", error);
     res.status(500).json({ msg: "Internal server error" });
   }
 };
@@ -234,3 +239,54 @@ export const createOrder = async (
     await queryRunner.release();
   }
 };
+
+//to get all the orders of the user 
+export const getOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+
+  //getting the token to get logged in userId
+  const token = req.cookies.jwt;
+  const data  = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
+  
+  let userId: any;
+
+  if(data){
+    userId = data.id;
+  }else{
+    res.status(401).json({msg: "Invalid token"});
+    return;
+  }
+
+  console.log("USERID--", userId);
+  
+
+  try {
+    const orderRepo = AppDataSource.getRepository(Orders);
+    const orderItemRepo = AppDataSource.getRepository(OrderItem);
+    const orders = await orderRepo.find({where: {user: {id: userId} }, relations: ["orderItem", "payment"]});
+    console.log("ORDERS--", orders);
+    
+    const orderItems = await orderItemRepo.find({where: {order: orders}, relations: ["product", "order"]});
+    console.log("ORDERITEMS-", orderItems);
+    
+    //getting all the orders of the user & mapping the orderItems to the orders
+    const orderItemsMap = orders.reduce((acc: any, curr: any, i:any) => {
+
+      acc[curr.id] = orderItems.filter((item: any) => item.order.id === curr.id);
+      
+      return acc;
+    }, []);
+
+    // console.log("ORDERS-", orders);
+    res.json({orders, orderItemsMap});
+    return
+  } catch (error) {
+    console.log("ERROR--", error);
+    res.status(500).json({msg: "Failed to fetch orders", ERROR: error});
+    return;
+  }
+
+}

@@ -53,3 +53,4 @@ once payment is done--
     call an api (createOrder) which will create new order with all the cart items of user,
     (once created clear all the cart items from the cart for the specific user in BE then in FE).
     after that create a new payment using (paymentSuccessful API) with all payment details.
+    console.log("Order created successfully", result.data);

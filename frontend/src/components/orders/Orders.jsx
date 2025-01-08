@@ -40,6 +40,9 @@ const Orders = () => {
       return;
     }
 
+    //after successful payment handler function will be called
+    //and the order will be created in the database
+    //and the cart will be cleared by calling the api in the backend
     const options = {
       key: "rzp_test_omD6kXJUMZEbn4",
       amount: amount,
@@ -59,7 +62,7 @@ const Orders = () => {
             {
               totalPrice: totalAmount,
               orderItem: cartItems,
-              paymentId: response.razorpay_payment_id, 
+              paymentId: response.razorpay_payment_id,
             },
             { withCredentials: true }
           );
@@ -68,25 +71,24 @@ const Orders = () => {
 
           if (result.status === 200 || result.status === 201) {
             console.log("Order created successfully", result.data);
-            
-            
+
             // clear the cart after successful order creation
             try {
-              
-              const result = await axios.delete("http://localhost:4000/clearCart", {
-                withCredentials: true,
-              })
+              const result = await axios.delete(
+                "http://localhost:4000/clearCart",
+                {
+                  withCredentials: true,
+                }
+              );
 
               console.log("Cart cleared successfully", result.data);
 
-              if(result.status === 200){
+              if (result.status === 200) {
                 dispatch(clearCartOnLogout());
               }
-
             } catch (error) {
               console.log("Error clearing cart data--", error);
             }
-
           } else {
             console.log("Error creating order", result.data);
           }
@@ -122,6 +124,7 @@ const Orders = () => {
   };
 
   const createRazorpayOrder = (amount) => {
+    
     let data = JSON.stringify({
       amount: amount * 100,
       currency: "INR",
@@ -158,14 +161,14 @@ const Orders = () => {
         responseId={responseId}
       />
 
-      <form onSubmit={paymentFetch}>
+      {/* <form onSubmit={paymentFetch}>
         <input type="text" name="paymentId" />
         <button type="submit" className="p-2">
           Submit
         </button>
-      </form>
+      </form> */}
 
-      <div>
+      {/* <div>
         {responseState.map((response) => (
           <ul className="border border-white p-2" key={response.id}>
             <li>{response.id}</li>
@@ -173,7 +176,7 @@ const Orders = () => {
             <li>{response.status}</li>
           </ul>
         ))}
-      </div>
+      </div> */}
     </>
   );
 };

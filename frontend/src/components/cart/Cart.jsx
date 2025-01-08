@@ -8,6 +8,7 @@ import {
 import { totalAmount } from "../../store/slices/cartSlice";
 import { plusOne, minusOne } from "../../store/slices/cartSlice";
 import OrderAccepted from "./OrderAccepted";
+import { useNavigate } from "react-router-dom";
 
 
 const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
@@ -15,6 +16,7 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
   const amount = useSelector((state) => state.cart.amount);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // console.log("responseState from orders--", responseState);
 
@@ -169,13 +171,22 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
               <h1 className=" text-xl mt-5 screen-max-7:w-44 font-bold text-yellow-400">
                 Total amount: $ {amount}
               </h1>
+              <div className="flex gap-5">
               <button
                 type="button"
-                className="p-3 w-52 mt-4 bg-green-300 font-medium hover:bg-green-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
-                onClick={() => createOrder(amount)}
+                className="p-3 w-52 mt-4 bg-purple-300 font-bold hover:bg-purple-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
+                onClick={() => navigate("/all-orders")}
               >
-                Buy Now
+                Orders
               </button>
+                <button
+                  type="button"
+                  className="p-3 w-52 mt-4 bg-green-300 font-bold hover:bg-green-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
+                  onClick={() => createOrder(amount)}
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
           </>
         )}

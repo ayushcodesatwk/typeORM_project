@@ -41,7 +41,6 @@ const Auth = () => {
         } 
       )
 
-
       console.log("line 35--", result);
 
       if (result.status == 200) {
@@ -119,7 +118,7 @@ const Auth = () => {
       confirmPassRef.current.value = "";
     }
   };
-
+  
   // loginsignup switch handler 
   const switchHandler = () => {
     dispatch(loginSignupSwitchHandler());

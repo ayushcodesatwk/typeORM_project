@@ -9,6 +9,7 @@ const About = lazy(() => import("./components/about/About"))
 const ProductPage = lazy(() => import("./components/product-page/ProductPage"))
 const UploadProduct = lazy(() => import("./components/product-uploader/UploadProduct")) 
 const Orders = lazy(() => import("./components/orders/Orders"))
+const AllOrders = lazy(() => import("./components/all-orders/AllOrders"));
 
 import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
@@ -60,14 +61,14 @@ function App() {
           <Route path="/*" element={<Store clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/store/:productId" element={<ProductPage clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/cart" element={<Orders />} />
-          <Route path="/order/success" element={<Orders />} />
+          <Route path="/all-orders" element={<AllOrders />} />
           <Route path="/uploadProduct" element={<UploadProduct />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/about" element={<About />} />
         </Routes>
         </Suspense>
       </BrowserRouter>
-      
+
       <ToastContainer
         position="top-right"
         autoClose={2000}

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  loginSignupSwitch: false,
+  loginSignupSwitch: true,
   isLoggedIn: false,
   isUserToken: false,
 };
@@ -21,11 +21,8 @@ const authSlice = createSlice({
     },
 
     setIsLoginUsingToken: (state, action) => {
-
       const isLogIn = action.payload;
-
       state.isLoggedIn = isLogIn;
-      
     },
 
     loginSignupSwitchHandler: (state) => {

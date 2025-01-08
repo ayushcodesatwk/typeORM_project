@@ -25,7 +25,7 @@ import {
 } from "../controllers/cart";
 
 import { uploadAnImageToCloudinary } from "../controllers/store";
-import { createOrder, getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
+import { createOrder, getOrders, getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
 const router = express.Router();
 
 //crud operations using typeorm
@@ -135,5 +135,8 @@ router.route("/createOrder").post(createOrder);
 
 //clear cart by userId
 router.route("/clearCart").delete(clearCartByUserId);
+
+//get all the orders of the user
+router.route("/all-orders").get(getOrders);
 
 export default router;

@@ -10,7 +10,7 @@ export class Orders {
     //mentioned UUID to make 'id' a string
     //by default it is a number
     @PrimaryGeneratedColumn()
-    Id: number;
+    id: number;
 
     @Column({ type: "date" })
     orderDate: Date;

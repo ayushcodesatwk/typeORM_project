@@ -4,6 +4,7 @@ import Loader from "../loader/Loader";
 
 const AllOrders = () => {
   const [allOrders, setAllOrders] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchAllOrders = async () => {
     try {
@@ -17,6 +18,7 @@ const AllOrders = () => {
       }
     } catch (error) {
       console.error("Error fetching all orders--", error.message);
+      setError(error);
     }
   };
 
@@ -24,8 +26,29 @@ const AllOrders = () => {
     fetchAllOrders();
   }, []);
 
+  const deleteOrder = async (orderId) => {
+
+      if(!orderId){
+        console.error("Order Id is required");
+        return;
+      }
+
+      const url = `http://localhost:4000/delete-order/${orderId}`
+
+      try {
+        const result = await axios.delete(url);
+
+        if(result.status === 200){
+          console.log("Order deleted successfully", result.data);
+          fetchAllOrders();
+        }
+      }catch(error){
+          console.error("Error deleting order--", error.message);
+      }
+  }
+
   return (
-    <div className="bg-gray-900 pt-44 min-h-screen text-white p-10">
+    <div className="bg-gray-900 pt-28 screen-max-9:pt-44 min-h-screen text-white p-10">
       <h1 className="text-4xl font-bold mb-8 text-center text-yellow-500">
         All Orders
       </h1>
@@ -52,6 +75,7 @@ const AllOrders = () => {
                   allOrders.orderItemsMap[order.id].map((item, i) => (
                     <>
                       {item && (
+                      <>
                         <li key={i} className="mb-4">
                           <div className="flex justify-between">
                             <div>
@@ -75,6 +99,8 @@ const AllOrders = () => {
                             </div>
                           </div>
                         </li>
+
+                      </>
                       )}
                     </>
                   ))}
@@ -93,11 +119,24 @@ const AllOrders = () => {
               </p>
               <p className="text-sm">Amount Paid: ${order.payment.amount}</p>
             </div>
+
+            <button className=" border font-bold hover:bg-[#ff5c5c] w-full text-white py-2 px-4 rounded mt-4 transition-colors duration-300 delay-150" onClick={() => deleteOrder(order.id)}>Delete Order</button>
           </div>
         ))
+      ) : error ? (
+        <div className="flex justify-center items-center bg-gray-900 h-full">
+          <p className="font-bold text-white text-center ">
+            Error fetching orders {error.message}
+          </p>
+        </div>
       ) : (
         <div className="flex justify-center items-center bg-gray-900 h-full">
           <Loader />
+        </div>
+      )}
+      {allOrders && allOrders.orders.length === 0 && (
+        <div className="flex justify-center items-center bg-gray-900 h-full">
+          <p className="font-bold text-white text-center ">No orders found</p>
         </div>
       )}
     </div>

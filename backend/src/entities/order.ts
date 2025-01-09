@@ -26,6 +26,8 @@ export class Orders {
     @JoinColumn({ name: "paymentId" })
     payment: Payments;
 
+    //cascade will make sure when we delete an order 
+    //it'll get deleted from the orderItem table as well
     @OneToMany(() => OrderItem, orders => orders.order)
     orderItem: OrderItem[];
 }

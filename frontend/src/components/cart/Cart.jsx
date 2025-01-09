@@ -160,11 +160,22 @@ const Cart = ({ createOrder, responseId, fetchPayment, responseState }) => {
             </div>
           ))
         ) : (
-          <h1 className="font-bold text-4xl text-center mt-5 text-yellow-400">
-            is empty
-          </h1>
+          <>
+              <h1 className="font-bold text-4xl text-center mt-5 text-yellow-400">
+                is empty
+              </h1>
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  className="p-3 w-52 mt-4 bg-purple-300 font-bold hover:bg-purple-600 hover:text-white text-black hover:scale-105 transition-transform duration-300"
+                  onClick={() => navigate("/all-orders")}
+                >
+                  Check your orders
+                </button>
+              </div>
+          </>
         )}
-
+        
         {!cartArray.length == 0 && (
           <>
             <div className="flex flex-col pb-20 m-auto w-1/2 items-end">

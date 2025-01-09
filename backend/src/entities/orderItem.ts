@@ -5,7 +5,6 @@ import { Orders } from "./order";
 
 @Entity()
 export class OrderItem{
-    
     @PrimaryGeneratedColumn()
     id:number;
 
@@ -19,7 +18,10 @@ export class OrderItem{
     @JoinColumn({name: "productId"})
     product: Product
 
-    @ManyToOne(() => Orders, orders => orders.orderItem)
+    @ManyToOne(() => Orders, orders => orders.orderItem, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({name: "orderId"})
     order: Orders
 }

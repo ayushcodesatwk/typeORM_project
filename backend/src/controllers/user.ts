@@ -140,3 +140,14 @@ export const isLoginCheck = async (
       res.status(400).json(false);
       return
 };
+
+// delete user
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+
+
+
+}

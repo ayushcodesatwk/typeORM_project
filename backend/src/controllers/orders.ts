@@ -259,24 +259,20 @@ export const getOrders = async (
     res.status(401).json({msg: "Invalid token"});
     return;
   }
-
-  console.log("USERID--", userId);
   
 
   try {
     const orderRepo = AppDataSource.getRepository(Orders);
     const orderItemRepo = AppDataSource.getRepository(OrderItem);
     const orders = await orderRepo.find({where: {user: {id: userId} }, relations: ["orderItem", "payment"]});
-    console.log("ORDERS--", orders);
+    // console.log("ORDERS--", orders);
     
     const orderItems = await orderItemRepo.find({where: {order: orders}, relations: ["product", "order"]});
-    console.log("ORDERITEMS-", orderItems);
+    // console.log("ORDERITEMS-", orderItems);
     
     //getting all the orders of the user & mapping the orderItems to the orders
     const orderItemsMap = orders.reduce((acc: any, curr: any, i:any) => {
-
       acc[curr.id] = orderItems.filter((item: any) => item.order.id === curr.id);
-      
       return acc;
     }, []);
 
@@ -284,9 +280,45 @@ export const getOrders = async (
     res.json({orders, orderItemsMap});
     return
   } catch (error) {
-    console.log("ERROR--", error);
+    // console.log("ERROR--", error);
     res.status(500).json({msg: "Failed to fetch orders", ERROR: error});
     return;
   }
+}
 
+
+//delete orders from cart
+export const deleteOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void>  => {
+  console.log("REQ PARAMS--",req.params);
+
+  const orderId = Number(req.params.orderId);
+  
+  if (!orderId) {
+    console.log("Order Id is required", orderId);
+    res.status(400).json({ message: "order Id is required" });
+    return;
+  }
+
+  const orderRepo = AppDataSource.getRepository(Orders);
+  const orderItemRepo = AppDataSource.getRepository(OrderItem);
+
+    try {
+      const deletedOrderItem = await orderItemRepo.delete({order: {id: orderId}});
+
+      const deleteOrder = await orderRepo.delete(orderId);
+      
+      if (deleteOrder.affected === 0 || deletedOrderItem.affected === 0) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+
+      res.status(200).json({ message: "Order deleted successfully" });
+    } catch (error) {
+      console.log("ERROR--", error);
+      res.status(500).json({msg: "Failed to delete order", ERROR: error});
+    }
 }

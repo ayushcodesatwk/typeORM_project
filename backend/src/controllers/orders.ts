@@ -6,11 +6,12 @@ import { Payments } from "../entities/payment";
 import { AppDataSource } from "../data-source";
 import { JwtPayload } from "jsonwebtoken";
 import jwtoken from "jsonwebtoken";
+import requireAuth, { RequestWithUserId } from "../middlewares/requireAuth";
 
 //to handle the order request from the user
 export const HandleOrdersRzrPay = async (
   req: Request,
-  res: Response,
+  res: Response
   // next: NextFunction
 ): Promise<void> => {
   //create new razorpay payment
@@ -27,13 +28,12 @@ export const HandleOrdersRzrPay = async (
     payment_capture: 1,
   };
 
-  console.log("options--",options);
-  
+  console.log("options--", options);
 
   try {
     //creating an order in reference to options
     const response = await razorpay.orders.create(options);
-    console.log("RESPONSE--",response);
+    console.log("RESPONSE--", response);
 
     res.json({
       order_id: response.id,
@@ -84,70 +84,6 @@ export const getPaymentDetails = async (
 };
 
 //to create an order and a payment in the table
-// export const createOrder = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   const { totalPrice, orderItem, paymentId } = req.body;
-
-//   console.log("order item-",orderItem);
-  
-
-//   //getting the token to get logged in userId
-//   const token = req.cookies.jwt;
-//   const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-//   console.log("data from jwt token- ", data);
-  
-//   const userId = data.id;
-
-//   //create respository
-//   const orderRepo = AppDataSource.getRepository(Orders);
-//   const orderItemRepo = AppDataSource.getRepository(OrderItem);
-//   const paymentRepo = AppDataSource.getRepository(Payments);
-
-//   //create a new order
-//   const order = new Orders();
-//   order.orderDate = new Date();
-//   order.totalPrice = totalPrice;
-//   order.user = userId;
-//   order.payment = paymentId;
-
-//   //create a new orderItem
-//   const orderItems = orderItem.map((item: any) => {
-//     const newOrderItem = new OrderItem();
-//     newOrderItem.quantity = item.quantity;
-//     newOrderItem.price = item.price;
-//     newOrderItem.product = item.product;
-//     newOrderItem.order = order;
-//     return newOrderItem;
-//   });
-
-//   //create a new payment
-//   const payment = new Payments();
-//   payment.amount = totalPrice;
-//   payment.paymentDate = new Date();
-//   payment.orders = [order];
-//   payment.paymentMethod = "Razorpay";
-//   payment.user = userId;
-//   payment.paymentId = paymentId;
-
-
-//   console.log("PAYMENT STATUS-", payment);
-//   console.log("ORDER STATUS-", order);
-//   console.log("ORDERITEM STATUS-", orderItems);
-
-//   try {
-//     await orderRepo.save(order);
-//     await orderItemRepo.save(orderItems);
-//     await paymentRepo.save(payment);
-//     res.status(200).json({ msg: "Order created successfully" });
-//   } catch (error) {
-//     res.status(500).json({ msg: "Failed to create order" });
-//   }
-// };
-
-//to create an order and a payment in the table
 export const createOrder = async (
   req: Request,
   res: Response,
@@ -155,41 +91,33 @@ export const createOrder = async (
 ): Promise<void> => {
   const { totalPrice, orderItem, paymentId } = req.body;
 
-
   if (!totalPrice || !orderItem || !paymentId) {
     res.status(400).json({ msg: "Missing required fields" });
     return;
   }
 
-  // getting the token from cookies to get the logged-in userId
-  const token = req.cookies.jwt;
-  if (!token) {
-    res.status(401).json({ msg: "No token provided" });
-    return;
-  }
+  const RequestWithUserId = req as RequestWithUserId;
 
-  let userId: any;
+  const userId:any = Number(RequestWithUserId.userId);
 
-  try {
-    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-    console.log("Data from JWT token: ", data);
-    userId = data.id;
-  } catch (err) {
+  if (!userId) {
     res.status(401).json({ msg: "Invalid token" });
     return;
   }
 
-  // Create repository instances
-  const orderRepo = AppDataSource.getRepository(Orders);
-  const orderItemRepo = AppDataSource.getRepository(OrderItem);
-  const paymentRepo = AppDataSource.getRepository(Payments);
 
-  // Begin transaction
+  // Create repository instances
+  const orderItemRepo = AppDataSource.getRepository(OrderItem);
+
+  // start a transaction
+  // transactions are a way to handle multiple queries
+  // in a single transaction
+  // to avoid foreign key contraint violations
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.startTransaction();
 
   try {
-    // Create a new order
+    // Create a new order instance
     const order = new Orders();
     order.orderDate = new Date();
     order.totalPrice = totalPrice;
@@ -207,7 +135,7 @@ export const createOrder = async (
       return newOrderItem;
     });
 
-    // Create a new payment
+    // Create a new payment instance
     const payment = new Payments();
     payment.amount = totalPrice;
     payment.paymentDate = new Date();
@@ -228,75 +156,76 @@ export const createOrder = async (
     await queryRunner.commitTransaction();
 
     res.status(200).json({ msg: "Order created successfully" });
-
   } catch (error) {
     // rollback the transaction in case of error
     await queryRunner.rollbackTransaction();
     console.error("Error creating order:", error);
     res.status(500).json({ msg: "Failed to create order", error });
   } finally {
-    // release the query runner (return it to the pool)
+    // release the query runner
     await queryRunner.release();
   }
 };
 
-//to get all the orders of the user 
+//to get all the orders of the user
 export const getOrders = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-
-  //getting the token to get logged in userId
-  const token = req.cookies.jwt;
-  const data  = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
   
-  let userId: any;
+  const RequestWithUserId = req as RequestWithUserId;
 
-  if(data){
-    userId = data.id;
-  }else{
-    res.status(401).json({msg: "Invalid token"});
+  const userId = Number(RequestWithUserId.userId);
+
+  if (!userId) {
+    res.status(401).json({ msg: "Invalid token" });
     return;
   }
-  
 
   try {
     const orderRepo = AppDataSource.getRepository(Orders);
     const orderItemRepo = AppDataSource.getRepository(OrderItem);
-    const orders = await orderRepo.find({where: {user: {id: userId} }, relations: ["orderItem", "payment"]});
+    const orders = await orderRepo.find({
+      where: { user: { id: userId } },
+      relations: ["orderItem", "payment"],
+    });
     // console.log("ORDERS--", orders);
-    
-    const orderItems = await orderItemRepo.find({where: {order: orders}, relations: ["product", "order"]});
+
+    const orderItems = await orderItemRepo.find({
+      where: { order: orders },
+      relations: ["product", "order"],
+    });
     // console.log("ORDERITEMS-", orderItems);
-    
+
     //getting all the orders of the user & mapping the orderItems to the orders
-    const orderItemsMap = orders.reduce((acc: any, curr: any, i:any) => {
-      acc[curr.id] = orderItems.filter((item: any) => item.order.id === curr.id);
+    const orderItemsMap = orders.reduce((acc: any, curr: any, i: any) => {
+      acc[curr.id] = orderItems.filter(
+        (item: any) => item.order.id === curr.id
+      );
       return acc;
     }, []);
 
     // console.log("ORDERS-", orders);
-    res.json({orders, orderItemsMap});
-    return
+    res.json({ orders, orderItemsMap });
+    return;
   } catch (error) {
     // console.log("ERROR--", error);
-    res.status(500).json({msg: "Failed to fetch orders", ERROR: error});
+    res.status(500).json({ msg: "Failed to fetch orders", ERROR: error });
     return;
   }
-}
-
+};
 
 //delete orders from cart
 export const deleteOrder = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void>  => {
-  console.log("REQ PARAMS--",req.params);
+): Promise<void> => {
+  console.log("REQ PARAMS--", req.params);
 
   const orderId = Number(req.params.orderId);
-  
+
   if (!orderId) {
     console.log("Order Id is required", orderId);
     res.status(400).json({ message: "order Id is required" });
@@ -306,19 +235,21 @@ export const deleteOrder = async (
   const orderRepo = AppDataSource.getRepository(Orders);
   const orderItemRepo = AppDataSource.getRepository(OrderItem);
 
-    try {
-      const deletedOrderItem = await orderItemRepo.delete({order: {id: orderId}});
+  try {
+    const deletedOrderItem = await orderItemRepo.delete({
+      order: { id: orderId },
+    });
 
-      const deleteOrder = await orderRepo.delete(orderId);
-      
-      if (deleteOrder.affected === 0 || deletedOrderItem.affected === 0) {
-        res.status(404).json({ message: "Order not found" });
-        return;
-      }
+    const deleteOrder = await orderRepo.delete(orderId);
 
-      res.status(200).json({ message: "Order deleted successfully" });
-    } catch (error) {
-      console.log("ERROR--", error);
-      res.status(500).json({msg: "Failed to delete order", ERROR: error});
+    if (deleteOrder.affected === 0 || deletedOrderItem.affected === 0) {
+      res.status(404).json({ message: "Order not found" });
+      return;
     }
-}
+
+    res.status(200).json({ message: "Order deleted successfully" });
+  } catch (error) {
+    console.log("ERROR--", error);
+    res.status(500).json({ msg: "Failed to delete order", ERROR: error });
+  }
+};

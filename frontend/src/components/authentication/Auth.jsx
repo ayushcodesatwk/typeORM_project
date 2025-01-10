@@ -1,9 +1,13 @@
 import axios from "axios";
-import React, { useRef, useState } from "react";
+import React, { useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { handleLogin, loginSignupSwitchHandler } from "../../store/slices/authSlice";
-
+import {
+  handleLogin,
+  loginSignupSwitchHandler,
+} from "../../store/slices/authSlice";
+import { fetchCart } from "../../utils/cartUtils";
+import { addAllItemsToCart, totalAmount } from "../../store/slices/cartSlice";
 
 const Auth = () => {
   //no need to create states on redux for this page
@@ -19,94 +23,91 @@ const Auth = () => {
   const phoneRef = useRef();
   const confirmPassRef = useRef();
 
-  //form submitHandler
-  const submitHandler = async (e) => {
-    e.preventDefault();
+  const submitHandler = async (event) => {
+    event.preventDefault();
 
-    const enteredMail = emailRef.current.value;
+    const email = emailRef.current.value;
 
-    //just sign in to existing account
     if (loginMode) {
-      const enteredPass = passRef.current.value;
-      console.log(enteredPass);
+      const password = passRef.current.value;
 
-      const result = await axios.post(
-        "http://localhost:4000/login",
-        {
-          email: enteredMail,
-          password: enteredPass,
-        },
-        {
-          withCredentials: true, // This allows cookies to be sent and received
-        } 
-      )
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/login",
+          { email, password },
+          { withCredentials: true }
+        );
 
-      console.log("line 35--", result);
+        // console.log("response from auth.jsx--", response);
+        
 
-      if (result.status == 200) {
-        console.log("USER LOGGED IN SUCCESSFULLY");
-        dispatch(handleLogin());
+        if (response.status === 200 || response.status === 201) {
+          dispatch(handleLogin());
+          const result = await fetchCart();
+          // console.log("result from auth.jsx--", result);
+
+          try {
+            if (result.status === 200 || result.status === 201) {
+              dispatch(addAllItemsToCart(result.data));
+              dispatch(totalAmount());
+            }
+          } catch (error) {
+            console.error("Error fetching cart items:", error.message);
+          }
+        }
         navigate("/store");
-      } else {
-        console.log("LOGIN FAILED");
+      } catch (error) {
+        console.error("Login failed:", error.message);
       }
 
       emailRef.current.value = "";
       passRef.current.value = "";
-
     } else {
-      //create new user
-      const enteredFname = fnameRef.current.value.trim();
-      const enteredLname = lnameRef.current.value.trim();
-      const enteredAddress = addRef.current.value.trim();
-      const enteredPhone = phoneRef.current.value.trim();
-      const enteredPass = passRef.current.value;
-      const enteredConfPass = confirmPassRef.current.value;
+      const firstName = fnameRef.current.value.trim();
+      const lastName = lnameRef.current.value.trim();
+      const address = addRef.current.value.trim();
+      const phoneNumber = phoneRef.current.value.trim();
+      const password = passRef.current.value;
+      const confirmPassword = confirmPassRef.current.value;
 
-      //verify phone
-      if (enteredPhone.length !== 10 || isNaN(enteredPhone)) {
-        return alert("Phone number must be exactly 10 digits.");
+      if (phoneNumber.length !== 10 || isNaN(phoneNumber)) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
       }
 
-      //regex to verify email
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(enteredMail)) {
-        return alert("Please enter a valid email address.");
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
       }
 
-      //password must contain atleast 6 characters
-      if (enteredPass.length < 6) {
-        return alert("Password must be at least 6 characters.");
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
       }
 
-      //password must match
-      if (enteredConfPass !== enteredPass) {
-        return alert("Password must be same, try again.");
+      if (confirmPassword !== password) {
+        alert("Password must be same, try again.");
+        return;
       }
 
+      try {
+        const response = await axios.post("http://localhost:4000/signup", {
+          firstName,
+          lastName,
+          address,
+          phoneNumber,
+          email,
+          password,
+        });
 
-      const result = await axios.post(
-        "http://localhost:4000/signup",
-        {
-          fname: enteredFname,
-          lname: enteredLname,
-          address: enteredAddress,
-          phone: enteredPhone,
-          email: enteredMail,
-          password: enteredPass,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+        if (response.status === 201) {
+          console.log("User created successfully");
+        } else {
+          console.error("Failed to create new user:", response.data);
         }
-      );
-
-
-      if (result.status == 201) {
-        console.log("USER CREATED SUCCESSFULLY");
-      } else {
-        console.log("FAILED TO CREATE NEW USER");
+      } catch (error) {
+        console.error("Failed to create new user:", error.message);
       }
 
       fnameRef.current.value = "";
@@ -118,11 +119,11 @@ const Auth = () => {
       confirmPassRef.current.value = "";
     }
   };
-  
-  // loginsignup switch handler 
+
+  // loginsignup switch handler
   const switchHandler = () => {
     dispatch(loginSignupSwitchHandler());
-  }
+  };
 
   return (
     <>

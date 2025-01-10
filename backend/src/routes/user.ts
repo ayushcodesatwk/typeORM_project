@@ -1,6 +1,7 @@
 import express from "express";
 import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
+import requireAuth from "../middlewares/requireAuth";
 
 import {
   addProductToTable,
@@ -25,7 +26,13 @@ import {
 } from "../controllers/cart";
 
 import { uploadAnImageToCloudinary } from "../controllers/store";
-import { createOrder, deleteOrder, getOrders, getPaymentDetails, HandleOrdersRzrPay } from "../controllers/orders"
+import {
+  createOrder,
+  deleteOrder,
+  getOrders,
+  getPaymentDetails,
+  HandleOrdersRzrPay,
+} from "../controllers/orders";
 const router = express.Router();
 
 //crud operations using typeorm
@@ -50,7 +57,7 @@ router.route("/signup").post(handleCreateNewUser);
 router.route("/login").get(logoutOnGetRequest).post(handleUserLogin);
 
 //login check
-router.route("/is-login").get(isLoginCheck);
+router.route("/is-login").get(requireAuth, isLoginCheck);
 
 // .post(async (req, res) => {
 //     //this is for, when we'll get the data from frontend
@@ -104,15 +111,15 @@ router.route("/store").get(searchItemInProductTable);
 //cart router
 router
   .route("/cart")
-  .get(fetchUserCart)
-  .post(addItemToCart)
-  .delete(deleteItemFromCart);
+  .get(requireAuth, fetchUserCart)
+  .post(requireAuth, addItemToCart)
+  .delete(requireAuth, deleteItemFromCart);
 
 //increase quantity by one
-router.route("/plus-one").put(plusOneItem);
+router.route("/plus-one").put(requireAuth, plusOneItem);
 
 //decrease quantity by one
-router.route("/minus-one").put(minusOneItem);
+router.route("/minus-one").put(requireAuth, minusOneItem);
 
 //search item in the product table
 router.route("/search").get(searchItemInProductTable);
@@ -120,7 +127,7 @@ router.route("/search").get(searchItemInProductTable);
 //filterProducts
 router.route("/filter").get(filterProductsByCategoryAndPrice);
 
-//add product to table
+//add product to product table 
 router.route("/addProduct").post(addProductToTable);
 
 //upload image
@@ -128,16 +135,15 @@ router.route("/uploadImage").post(uploadAnImageToCloudinary);
 
 //handle orders & payments
 router.route("/orders").post(HandleOrdersRzrPay);
-router.route("/payment/:paymentId").get(getPaymentDetails)
+router.route("/payment/:paymentId").get(getPaymentDetails);
 
 //create order on successful payment
-router.route("/createOrder").post(createOrder);
+router.route("/createOrder").post(requireAuth, createOrder);
 
 //clear cart by userId
-router.route("/clearCart").delete(clearCartByUserId);
-
+router.route("/clearCart").delete(requireAuth, clearCartByUserId);
 //get all the orders of the user
-router.route("/all-orders").get(getOrders);
+router.route("/all-orders").get(requireAuth, getOrders);
 
 //delete an order
 router.route("/delete-order/:orderId").delete(deleteOrder);

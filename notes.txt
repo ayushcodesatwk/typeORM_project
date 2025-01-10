@@ -16,7 +16,15 @@ DATABASE DRIVER (postgres, sql etc)
 
  relations in typeORM -
 
- to make one to many relations
+ to make one to many relations in typeORM, we use decorators-
+
+ @OneToMany(() => Cart, (cart) => cart.user)
+ cart: Cart[]
+    
+ to make many to one relations in typeORM, we use decorators-
+
+ @ManyToOne(() => Cart, (cart) => cart.user)
+ user: User
 
 //making one to many or many to one relation with the product db.
 //1st argument- cb with the db we are making connection with, 
@@ -54,3 +62,22 @@ once payment is done--
     (once created clear all the cart items from the cart for the specific user in BE then in FE).
     after that create a new payment using (paymentSuccessful API) with all payment details.
     console.log("Order created successfully", result.data);
+
+--------------------------------
+
+CreateOrder api- 
+
+I have used queryRunner in the createOrder api to create a new order with cart_items and payment.
+we start a transaction first and then we create the instance of order and payment and then we commit 
+the transaction, 
+if any error occurs then we rollback the transaction which means that the order and 
+payment will not be created in the database.
+
+--------------------------------
+
+requireAuth middleware-
+
+In the requireAuth middleware or any other middleware, we never use return statement, just send the response
+and to attach the userId or any other data to the request object, we can use custom properties by extending it.
+
+--------------------------------

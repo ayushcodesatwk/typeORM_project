@@ -97,6 +97,7 @@ export const uploadAnImageToCloudinary = async (
   }
 };
 
+//saving product as an admin
 export const addProductToTable = async (
   req: Request,
   res: Response,

@@ -1,9 +1,9 @@
 import { Cart } from "../entities/cart";
-import requireAuth from "../middlewares/user";
 import { JwtPayload } from "jsonwebtoken";
 import jwtoken from "jsonwebtoken";
 import { Product } from "../entities/product";
 import { Request, Response, NextFunction } from "express";
+import { RequestWithUserId } from "../middlewares/requireAuth";
 import { AppDataSource } from "../data-source";
 
 // adding item to cart
@@ -19,11 +19,14 @@ export const addItemToCart = async (
   const { product } = req.body;
   const productId = product.id;
 
-  //getting the token to get logged in userId
-  const token = req.cookies.jwt;
-  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-  console.log("log the web token data", data);
-  const userId = data.id;
+  const RequestWithUserId = req as RequestWithUserId;
+
+  const userId: any = Number(RequestWithUserId.userId);
+
+  if (!userId) {
+    res.status(401).json({ msg: "Invalid token" });
+    return;
+  }
 
   console.log("this is product--", product);
 
@@ -77,41 +80,30 @@ export const fetchUserCart = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  //what I need to fetch items:-
-  //userId, cartRepo
 
   const cartRepo = AppDataSource.getRepository(Cart);
 
-  //getting the token to get logged in userId
-  const token = req.cookies.jwt;
+  const reqWithUserId = req as RequestWithUserId;
 
-  if (token) {
-    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-    console.log("log the web token data", data);
-    const userId = data.id;
+  const userId = Number(reqWithUserId.userId);
 
-    console.log("userId from cart--", userId);
+  if (!userId) {
+    res.status(401).json({ msg: "Token is invalid" });
+    return;
+  }
 
-    try {
-      if (!userId) {
-        res.status(401).json({ msg: "Internal server error" });
-        return;
-      } else {
-        const cartArray = await cartRepo.find({
-          where: { user: { id: userId } },
-          relations: ["product", "user"],
-        });
+  try {
 
-        res.status(201).json(cartArray);
+    const cartArray = await cartRepo.find({
+      where: { user: { id: userId } },
+      relations: ["product", "user"],
+    });
 
-        return;
-      }
-    } catch (error) {
-      res.status(401).json({ msg: "ERROR FETCHING USER CART", error });
-      return;
-    }
-  } else {
-    res.status(400).json({ msg: "USER NOT FOUND: PLEASE LOGIN" });
+    res.status(201).json(cartArray);
+    
+    return;
+  } catch (error) {
+    res.status(401).json({ msg: "ERROR FETCHING USER CART", error });
     return;
   }
 };
@@ -265,42 +257,30 @@ export const clearCartByUserId = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    res.status(401).json({ msg: "No token provided" });
-    return;
-  }
+  // we have used middleware so we don't need to verify the token
+  // we'll get the userId directly from the request like this-
+  const reqWithUserId = req as RequestWithUserId;
 
-  let userId: any;
+  const userId = reqWithUserId.userId;
 
-  try {
-    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-    userId = data.id;
-    console.log("USER ID from clearCART--",userId);
-    
-  } catch (err) {
-    res.status(401).json({ msg: "Invalid token" });
-    return;
-  }
+  // console.log("REQUEST WITH USER ID FROM CLEAR CART--", reqWithUserId);
 
   try {
-
     const deleteItem = await AppDataSource.createQueryBuilder()
       .delete()
       .from(Cart)
       .where("userId = :userId", { userId: userId })
       .execute();
-  
+
     if (deleteItem.affected === 0) {
       res.status(404).json({ message: "Product not found in cart" });
       return;
     }
-  
+
     console.log("DeletedITEM", deleteItem);
-  
+
     res.status(200).json({ message: "Product Deleted" });
     return;
-    
   } catch (error) {
     res.status(500).json({ msg: "Failed to delete cart" });
   }

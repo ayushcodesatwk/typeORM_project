@@ -14,10 +14,14 @@ const AllOrders = lazy(() => import("./components/all-orders/AllOrders"));
 import { useDispatch } from "react-redux";
 import { setIsLoginUsingToken } from "./store/slices/authSlice";
 import { Bounce, ToastContainer, toast } from "react-toastify";
+import Loader from "./components/loader/Loader";
+import { addAllItemsToCart, totalAmount } from "./store/slices/cartSlice";
 
 
 function App() {
+
   const dispatch = useDispatch();
+
 
   //set the isLogin to
   const isLoginCheck = async () => {
@@ -28,22 +32,29 @@ function App() {
     if (waitForMe.status === 200) {
       console.log("user is already logged in--", waitForMe);
       dispatch(setIsLoginUsingToken(waitForMe.data));
+      const result = await fetchCart();
+
+      if(result.status === 200 || result.status === 201){ 
+        dispatch(addAllItemsToCart(result.data));
+        dispatch(totalAmount());
+      }
     }
 
-    console.log("user is not logged in--", waitForMe);
+    console.log("current login status-- ", waitForMe);
     return;
   };
 
   //toast notification
   const notify = (msg) => {
     toast.success(msg, {
-      position: "top-right",
-      autoClose: 2000,
+      position: "top-center",
+      autoClose: 1000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
+      theme: "colored",
       transition: Bounce,
     });
   };
@@ -56,7 +67,7 @@ function App() {
     <>
       <BrowserRouter>
         <Navbar />
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loader/>}>
         <Routes>
           <Route path="/*" element={<Store clickFunc={(msg) => notify(msg)}/>} />
           <Route path="/store/:productId" element={<ProductPage clickFunc={(msg) => notify(msg)}/>} />
@@ -70,13 +81,15 @@ function App() {
       </BrowserRouter>
 
       <ToastContainer
-        position="top-right"
-        autoClose={2000}
+        position="top-center"
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         toastStyle={{ }}
+        
         closeOnClick
         rtl={false}
+        theme="colored"
         pauseOnFocusLoss
         draggable
         pauseOnHover

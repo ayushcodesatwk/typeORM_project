@@ -6,7 +6,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from 'express-session';
 import bodyParser from "body-parser";
-import Razorpay from "razorpay";
 
 
 const app = express();

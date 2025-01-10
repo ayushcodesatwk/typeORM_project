@@ -3,9 +3,7 @@ import { AppDataSource } from "../data-source";
 import { Users } from "../entities/user";
 import bcrypt from "bcrypt";
 import { createToken } from "../service/auth";
-import jwtoken from "jsonwebtoken";
-import { JwtPayload } from "jsonwebtoken";
-
+import { RequestWithUserId } from "../middlewares/requireAuth";
 
 
 //creating a new user
@@ -121,24 +119,18 @@ export const isLoginCheck = async (
 ): Promise<void> => {
 
      //getting the token to get logged in userId
-      const token = req.cookies.jwt;
-
-      if(token){
-        const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-        console.log("isLoginCheck web token data--", data);
-  
-        if(data.id){
-            res.status(200).json(true);
-            return 
+      const reqWithUserId = req as RequestWithUserId;
+      
+        const userId = Number(reqWithUserId.userId);
+      
+        if (!userId) {
+          res.status(401).json(false);
+          return;
         }
-        else{
-            res.status(400).json(false);
-            return
-        }
-      }
 
-      res.status(400).json(false);
-      return
+        res.status(200).json(true);
+        
+        return;
 };
 
 // delete user

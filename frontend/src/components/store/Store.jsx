@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addAllItems, removeAllItems } from "../../store/slices/storeSlice";
-import { addAllItemsToCart } from "../../store/slices/cartSlice";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ProductFilter from "../filter/ProductFilter";
 import Loader from "../loader/Loader";
+import { fetchCart } from "../../utils/cartUtils";
+import { addAllItemsToCart, clearCartOnLogout, totalAmount } from "../../store/slices/cartSlice";
+import { setIsLoginUsingToken } from "../../store/slices/authSlice";
 
 const Store = ({ clickFunc }) => {
   const storeArray = useSelector((state) => state.store.storeArr);
@@ -58,7 +59,7 @@ const Store = ({ clickFunc }) => {
         withCredentials: true,
       });
 
-      console.log("isLogin from store", isLogin);
+      // console.log("isLogin from store", isLogin);
 
       if (isLogin.data) {
         const result = await axios.post(
@@ -73,19 +74,29 @@ const Store = ({ clickFunc }) => {
 
         console.log("RESULT FROM ADDTOCART-", result);
 
-        if (result.status === 200) {
+        if (result.status === 200 || result.status === 201) {
           console.log("addToCart result-- ", result);
-          dispatch(addAllItemsToCart(result.data));
-          clickFunc("Item added to cart!");
-        }
-        //we get 201 when we add new item
-        else if (result.status === 201) {
+          // fetch cart and then dispatch the result
+          const cartResult = await fetchCart();
+
+          console.log("result from store.jsx--", cartResult);
+
+          try {
+            if (cartResult.status === 201 || cartResult.status === 200) {
+              dispatch(addAllItemsToCart(cartResult.data));
+              dispatch(totalAmount());
+            }
+          } catch (error) {
+            console.error("Error fetching cart items:", error.message);
+          }
           clickFunc("Item added to cart!");
         }
       }
     } catch (error) {
       alert("Please login before adding items...");
       navigate("/login");
+      dispatch(setIsLoginUsingToken(false));
+      dispatch(clearCartOnLogout());
       return console.error("Error adding item to cart--", error);
     }
   };
@@ -139,7 +150,6 @@ const Store = ({ clickFunc }) => {
     <>
       <div className="flex pt-24 bg-gray-900 screen-max-6:w-fit min-h-screen">
         <ProductFilter
-          // selectedCat={checkedItems}
           checkHandler={(category, priceCat) =>
             checkCategoryHandler(category, priceCat)
           }
@@ -167,6 +177,8 @@ const Store = ({ clickFunc }) => {
                   $ {item.price}
                 </p>
                 <button
+                  // this will stop event bubbling:- means if we click on this button,
+                  // it will not trigger the click event on parent
                   onClick={(e) => {
                     e.stopPropagation();
                     addItemHandler(item);

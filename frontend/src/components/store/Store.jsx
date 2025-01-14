@@ -147,53 +147,53 @@ const Store = ({ clickFunc }) => {
   };
 
   return (
-    <>
-      <div className="flex pt-24 bg-gray-900 screen-max-6:w-fit min-h-screen">
-        <ProductFilter
-          checkHandler={(category, priceCat) =>
-            checkCategoryHandler(category, priceCat)
-          }
-        />
-        <div className="flex w-full flex-col ml-80 gap-5 items-center screen-max-9:mt-20">
-          <div
-            className="flex flex-wrap gap-10 justify-center mb-14"
-            onScroll={handleScroll}
-          >
-            {storeArray.map((item, ind) => (
-              <div
-                key={ind}
-                className="border bg-[#4f156e] h-fit w-80 cursor-pointer border-[#D1D5DB] hover:scale-110 transition-transform duration-300 shadow-md"
-                onClick={() => locateToProductDetails(item.id)}
-              >
-                <div className="h-44 overflow-hidden m-3">
-                  <img
-                    src={item.imageURL}
-                    alt="item-image"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <p className="m-3 text-white">{item.title}</p>
-                <p className="font-bold text-xl mt-4 m-3 text-[#fff]">
-                  $ {item.price}
-                </p>
-                <button
-                  // this will stop event bubbling:- means if we click on this button,
-                  // it will not trigger the click event on parent
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addItemHandler(item);
-                  }}
-                  className="font-bold text-xl mt-4 m-3 p-3 bg-[ #4169e1] border border-white text-white hover:bg-purple-500 transition-colors duration-300 delay-150"
-                >
-                  Add to Cart
-                </button>
+    
+  <>
+    <div className="flex w-full screen-max-7:w-fit screen-max-7:flex-col border-white pt-24 screen-max-6:pt-44 screen-max-6:p-10 bg-gray-900 min-h-screen">
+      <ProductFilter
+        checkHandler={(category, priceCat) =>
+          checkCategoryHandler(category, priceCat)
+        }
+      />
+      {/* all products */}
+      <div className="flex screen-max-6:w-full flex-col screen-max-9:mt-8 w-full gap-5 items-center">
+        <div
+          className="flex flex-wrap gap-10 justify-center mb-14"
+          onScroll={handleScroll}
+        >
+          {storeArray.map((item, ind) => (
+            <div
+              key={ind}
+              className="border bg-[#4f156e] h-fit w-80 screen-max-6:w-72 screen-max-4:w-64 cursor-pointer border-[#D1D5DB] hover:scale-110 transition-transform duration-300 shadow-md"
+              onClick={() => locateToProductDetails(item.id)}
+            >
+              <div className="h-44 overflow-hidden m-3 screen-max-6:h-40">
+                <img
+                  src={item.imageURL}
+                  alt="item-image"
+                  className="w-full h-full object-cover"
+                />
               </div>
-            ))}
-          </div>
-          {loading && <Loader />}
+              <p className="m-3 text-white">{item.title}</p>
+              <p className="font-bold text-xl mt-4 m-3 text-[#fff]">
+                $ {item.price}
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addItemHandler(item);
+                }}
+                className="font-bold text-xl mt-4 m-3 p-3 screen-max-9:bg-purple-500 border border-white text-white hover:bg-purple-700 transition-colors duration-300 delay-150"
+              >
+                Add to Cart
+              </button>
+            </div>
+          ))}
         </div>
+        {loading && <Loader />}
       </div>
-    </>
+    </div>
+  </>
   );
 };
 

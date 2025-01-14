@@ -13,6 +13,10 @@ DATABASE DRIVER (postgres, sql etc)
 
 - by default all operations are asynchronous in typeORM
 -----------------------------------------------
+Run the frontend app using 'npm run dev' 
+Run the backend app using 'npm run start:dev' 
+
+-----------------------------------------------
 
  relations in typeORM -
 
@@ -81,3 +85,4 @@ In the requireAuth middleware or any other middleware, we never use return state
 and to attach the userId or any other data to the request object, we can use custom properties by extending it.
 
 --------------------------------
+

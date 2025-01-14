@@ -153,11 +153,15 @@ export const minusOneItem = async (
 
   const { cartId } = req.body;
 
+  const reqWithUserId = req as RequestWithUserId;
+
   //getting the token to get logged in userId
-  const token = req.cookies.jwt;
-  const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-  console.log("log the web token data", data);
-  const userId = data.id;
+  const userId = Number(reqWithUserId.userId);
+
+  if (!userId) {
+    res.status(401).json({ msg: "Invalid token" });
+    return;
+  }
 
   const cartRepo = AppDataSource.getRepository(Cart);
 
@@ -214,14 +218,14 @@ export const plusOneItem = async (
   const { cartId } = req.body;
 
   //getting the token to get logged in userId
-  const token = req.cookies.jwt;
+    const reqWithUserId = req as RequestWithUserId;
 
-  console.log("tokn from cart plusone---", token, cartId);
+    const userId = Number(reqWithUserId.userId);
 
-  if (token) {
-    const data = jwtoken.verify(token, "chickiwikichicki") as JwtPayload;
-    console.log("log the web token data", data);
-    const userId = data.id;
+    if (!userId) {
+      res.status(401).json({ msg: "Invalid token" });
+      return;
+    }
 
     const cartRepo = AppDataSource.getRepository(Cart);
 
@@ -248,8 +252,7 @@ export const plusOneItem = async (
 
       return;
     }
-  }
-};
+  };
 
 //clear cart items by userId
 export const clearCartByUserId = async (

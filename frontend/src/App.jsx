@@ -5,7 +5,6 @@ import axios from "axios";
 import Navbar from "./components/navbar/Navbar";
 const Store = lazy(() => import("./components/store/Store"))
 const Auth = lazy(() => import("./components/authentication/Auth"))
-const About = lazy(() => import("./components/about/About"))
 const ProductPage = lazy(() => import("./components/product-page/ProductPage"))
 const UploadProduct = lazy(() => import("./components/product-uploader/UploadProduct")) 
 const Orders = lazy(() => import("./components/orders/Orders"))
@@ -75,7 +74,6 @@ function App() {
           <Route path="/all-orders" element={<AllOrders />} />
           <Route path="/uploadProduct" element={<UploadProduct />} />
           <Route path="/login" element={<Auth />} />
-          <Route path="/about" element={<About />} />
         </Routes>
         </Suspense>
       </BrowserRouter>
